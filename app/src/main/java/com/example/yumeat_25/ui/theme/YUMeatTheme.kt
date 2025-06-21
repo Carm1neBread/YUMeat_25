@@ -13,10 +13,10 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 // Colori caldi e accoglienti per YUMeat
-private val md_theme_light_primary = Color(0xFF6B4E3D)
-private val md_theme_light_onPrimary = Color(0xFFFFFFFF)
-private val md_theme_light_primaryContainer = Color(0xFFF2E6D8)
-private val md_theme_light_onPrimaryContainer = Color(0xFF261A0F)
+val button_green_primary = Color(0xFF1F5F5B)
+private val text_blue_onPrimary = Color(0xFF0694F4)
+private val primaryContainer_white = Color(0x63999999)
+private val onPrimaryContainer_black = Color(0xFF000000)
 
 private val md_theme_light_secondary = Color(0xFF6F5B40)
 private val md_theme_light_onSecondary = Color(0xFFFFFFFF)
@@ -39,10 +39,10 @@ private val md_theme_light_surface = Color(0xFFFFFBF7)
 private val md_theme_light_onSurface = Color(0xFF1F1B16)
 
 private val LightColors = lightColorScheme(
-    primary = md_theme_light_primary,
-    onPrimary = md_theme_light_onPrimary,
-    primaryContainer = md_theme_light_primaryContainer,
-    onPrimaryContainer = md_theme_light_onPrimaryContainer,
+    primary = button_green_primary,
+    onPrimary = text_blue_onPrimary,
+    primaryContainer = primaryContainer_white,
+    onPrimaryContainer = onPrimaryContainer_black,
     secondary = md_theme_light_secondary,
     onSecondary = md_theme_light_onSecondary,
     secondaryContainer = md_theme_light_secondaryContainer,

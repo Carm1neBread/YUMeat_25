@@ -49,7 +49,7 @@ fun YUMeatNavigation(
 
         composable("onboarding_goals") {
             OnboardingGoalsScreen(
-                onComplete = { goals ->
+                onNext = { goals ->
                     userProfileRepository.updateGoals(goals)
                     userProfileRepository.completeOnboarding()
                     navController.navigate("main") {
