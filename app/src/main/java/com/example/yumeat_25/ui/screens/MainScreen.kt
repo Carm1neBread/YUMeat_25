@@ -1,276 +1,295 @@
 package com.example.yumeat_25.ui.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.yumeat_25.data.*
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     navController: NavController
 ) {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
     val mealRepository = remember { MealRepository() }
     val meals by mealRepository.meals.collectAsState()
 
-    val todaysMeals = remember(meals) {
-        mealRepository.getTodaysMeals().groupBy { it.type }
-    }
+    // Replace these with your real data
+    val kcalGoal = 1200
+    val kcalRemaining = 572
+    val carbs = 128
+    val carbsGoal = 262
+    val protein = 78
+    val proteinGoal = 121
+    val fat = 54
+    val fatGoal = 60
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerContent(
-                onNavigate = { route ->
-                    navController.navigate(route)
-                    scope.launch { drawerState.close() }
-                }
-            )
-        }
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("YUMeat") },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = {
-                                scope.launch { drawerState.open() }
-                            }
-                        ) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu")
-                        }
-                    }
-                )
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navController.navigate("add_meal") }
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Aggiungi pasto")
-                }
-            }
-        ) { paddingValues ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    Text(
-                        text = "I tuoi pasti di oggi",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+    val todaysMeals = listOf(
+        Triple("Latte", "250 ml", "98 kcal"),
+        Triple("Pasta", "86 g", "237 kcal"),
+        Triple("Petto di pollo", "110 g", "130 kcal"),
+    )
 
-                items(MealType.values()) { mealType ->
-                    MealTypeCard(
-                        mealType = mealType,
-                        meals = todaysMeals[mealType] ?: emptyList()
-                    )
-                }
+    // Date
+    val now = LocalDate.now()
+    val dayOfWeek = now.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+    val month = now.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+    val day = now.dayOfMonth
 
-                if (meals.isEmpty()) {
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(24.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "🍽️",
-                                    fontSize = 48.sp,
-                                    modifier = Modifier.padding(bottom = 16.dp)
-                                )
-                                Text(
-                                    text = "Nessun pasto registrato oggi",
-                                    fontSize = 16.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = "Tocca il pulsante + per iniziare",
-                                    fontSize = 14.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+    // Used for Safe mode (eye) - implement your logic accordingly
+    val isSafeMode = false
 
-@Composable
-fun MealTypeCard(
-    mealType: MealType,
-    meals: List<Meal>
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            Modifier
+                .fillMaxSize()
+                .padding(24.dp)
         ) {
-            Text(
-                text = mealType.displayName,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+            // Top bar with menu, date, safe mode
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp, bottom = 2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                IconButton(onClick = { /* Drawer */ }) {
+                    Icon(Icons.Default.Menu, contentDescription = "Menu")
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "$dayOfWeek $month",
+                        fontSize = 14.sp,
+                        color = Color.Black
+                    )
+                    Text(
+                        text = day.toString(),
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                }
+                IconButton(onClick = { /* Safe mode toggle */ }) {
+                    Icon(
+                        Icons.Default.Person,
+                        contentDescription = "Safe mode",
+                        tint = Color.Black
+                    )
+                }
+            }
 
-            if (meals.isEmpty()) {
-                Text(
-                    text = "Nessun alimento aggiunto",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            } else {
-                meals.forEach { meal ->
-                    Row(
+            Spacer(Modifier.height(10.dp))
+
+            // Card: Riepilogo di oggi + Circular Progress
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 2.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Riepilogo di oggi",
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp,
+                        color = Color.Black
+                    )
+                    Box(
+                        contentAlignment = Alignment.Center,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .padding(top = 8.dp, bottom = 4.dp)
+                            .size(120.dp)
                     ) {
-                        Text(
-                            text = meal.name,
-                            fontSize = 14.sp,
-                            modifier = Modifier.weight(1f)
+                        // Simulated circular progress (replace with your own if needed)
+                        CircularProgressIndicator(
+                            progress = kcalRemaining / kcalGoal.toFloat(),
+                            color = Color.Black,
+                            strokeWidth = 7.dp,
+                            modifier = Modifier.size(110.dp)
                         )
-                        if (meal.notes.isNotEmpty()) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = meal.notes,
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                text = "$kcalRemaining",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 28.sp,
+                                color = Color.Black
+                            )
+                            Text(
+                                text = "kcal",
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 16.sp,
+                                color = Color.Black
                             )
                         }
                     }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun DrawerContent(
-    onNavigate: (String) -> Unit
-) {
-    val userProfileRepository = remember { UserProfileRepository() }
-    val userProfile by userProfileRepository.userProfile.collectAsState()
-    val completionStatus = userProfile.getCompletionStatus()
-
-    ModalDrawerSheet {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            // Header
-            Text(
-                text = "YUMeat",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 32.dp)
-            )
-
-            // Navigation Items with completion indicators
-            DrawerNavigationItem(
-                icon = Icons.Default.Person,
-                title = "Profilo",
-                isCompleted = completionStatus["personal_data"] == true,
-                onClick = { onNavigate("profile") }
-            )
-
-            DrawerNavigationItem(
-                icon = Icons.Default.Person, //Book
-                title = "Diario del benessere",
-                onClick = { onNavigate("wellness_diary") }
-            )
-
-            DrawerNavigationItem(
-                icon = Icons.Default.Person, //Resturant
-                title = "Ricette",
-                onClick = { onNavigate("recipes") }
-            )
-
-            DrawerNavigationItem(
-                icon = Icons.Default.Person, //School
-                title = "Educazione alimentare",
-                onClick = { onNavigate("education") }
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Safe Mode Toggle
-            if (userProfile.goals.safeMode) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        Icons.Default.Person, //Eye
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
                     Text(
-                        text = "Modalità Safe attiva",
+                        text = "Rimanenti",
                         fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(start = 8.dp)
+                        color = Color.Gray
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    // Macros: Carbs / Protein / Fat
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        MacroSummary("Carboidrati", carbs, carbsGoal)
+                        MacroSummary("Proteine", protein, proteinGoal)
+                        MacroSummary("Grassi", fat, fatGoal)
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // List of meals
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp, horizontal = 8.dp)
+                ) {
+                    Text(
+                        text = "Cosa hai mangiato",
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp,
+                        color = Color.Black,
+                        modifier = Modifier.padding(start = 8.dp, bottom = 6.dp)
+                    )
+                    // Table header (optional, not in image)
+                    todaysMeals.forEach { (name, qty, kcal) ->
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp, vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = name,
+                                    fontSize = 15.sp,
+                                    color = Color.Black
+                                )
+                                Text(
+                                    text = qty,
+                                    fontSize = 12.sp,
+                                    color = Color.Gray
+                                )
+                            }
+                            Text(
+                                text = kcal,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Black
+                            )
+                        }
+                    }
+                    // Dettagli link
+                    Text(
+                        text = "Dettagli",
+                        color = Color.Gray,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(top = 12.dp)
+                            .clickable { navController.navigate("add_meal") }
                     )
                 }
             }
         }
+
+        // Floating Add button (bottom left)
+        FloatingActionButton(
+            onClick = { navController.navigate("add_meal") },
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 20.dp, bottom = 18.dp),
+            containerColor = Color.White
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Aggiungi pasto", tint = Color.Black)
+        }
+
+        // Floating QR/other button (bottom right, use a placeholder icon)
+        FloatingActionButton(
+            onClick = { /* TODO: Add QR or navigation logic */ },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 20.dp, bottom = 18.dp),
+            containerColor = Color.White
+        ) {
+            Icon(Icons.Default.Person, contentDescription = "QR", tint = Color.Black)
+        }
+
+        // Bottom indicator bar
+        Box(
+            Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 4.dp)
+                .width(42.dp)
+                .height(7.dp)
+                .clip(RoundedCornerShape(50))
+                .background(Color(0xFFDDDDDD))
+        )
     }
 }
 
 @Composable
-fun DrawerNavigationItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String,
-    isCompleted: Boolean = false,
-    onClick: () -> Unit
-) {
-    NavigationDrawerItem(
-        icon = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(icon, contentDescription = null)
-                if (isCompleted) {
-                    Icon(
-                        Icons.Default.CheckCircle,
-                        contentDescription = "Completato",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .size(16.dp)
-                            .offset(x = (-4).dp, y = (-4).dp)
-                    )
-                }
-            }
-        },
-        label = { Text(title) },
-        selected = false,
-        onClick = onClick,
-        modifier = Modifier.padding(vertical = 4.dp)
-    )
+fun MacroSummary(label: String, value: Int, goal: Int) {
+    Row {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f) // <-- No parentheses after weight!
+        ) {
+            Text(
+                label,
+                fontSize = 13.sp,
+                color = Color.Gray
+            )
+            Text(
+                "$value / $goal g",
+                fontWeight = FontWeight.Medium,
+                fontSize = 15.sp,
+                color = Color.Black
+            )
+        }
+    }
 }
