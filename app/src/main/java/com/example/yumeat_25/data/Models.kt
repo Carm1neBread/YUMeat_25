@@ -16,7 +16,9 @@ data class DietaryPreferences(
     val vegan: Boolean = false,
     val glutenFree: Boolean = false,
     val dairyFree: Boolean = false,
-    val allergies: List<String> = emptyList()
+    val allergies: List<String> = emptyList(),
+    val avoidRedMeat: Boolean = false,
+    val avoidSugar: Boolean = false
 )
 
 @Immutable
