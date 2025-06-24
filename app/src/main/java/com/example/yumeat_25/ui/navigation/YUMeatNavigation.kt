@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.yumeat_25.data.UserProfileRepository
+import com.example.yumeat_25.data.MealRepository
 import com.example.yumeat_25.ui.screens.*
 import com.example.yumeat_25.ui.screens.onboarding.*
 
@@ -14,7 +15,11 @@ fun YUMeatNavigation(
     navController: NavHostController = rememberNavController()
 ) {
     val userProfileRepository = remember { UserProfileRepository() }
+    val mealRepository = remember { MealRepository() }
     val isFirstLaunch by userProfileRepository.isFirstLaunch.collectAsState()
+
+    // Used to pass Meal name between screens (safer than the entire object)
+    var selectedMealName by remember { mutableStateOf<String?>(null) }
 
     NavHost(
         navController = navController,
@@ -98,7 +103,24 @@ fun YUMeatNavigation(
         }
 
         composable("recipes") {
-            RecipesScreen(onBack = { navController.popBackStack() })
+            RecipesScreen(
+                navController = navController,
+                mealRepository = mealRepository,
+                onRecipeClick = { meal ->
+                    selectedMealName = meal.name
+                    navController.navigate("recipe_detail")
+                }
+            )
+        }
+
+        composable("recipe_detail") {
+            selectedMealName?.let { mealName ->
+                RecipeDetailScreen(
+                    navController = navController,
+                    mealName = mealName,
+                    mealRepository = mealRepository
+                )
+            }
         }
 
         composable("education") {

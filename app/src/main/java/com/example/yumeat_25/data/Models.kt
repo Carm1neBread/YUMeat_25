@@ -57,7 +57,10 @@ data class Meal(
     val name: String,
     val type: MealType,
     val timestamp: Long = System.currentTimeMillis(),
-    val imageUrl: String? = null,
+    val imageRes: Int? = null,
+    val emoji: String? = null,
+    val ingredientTitles: List<String>? = null,
+    val ingredientRows: List<List<String>>? = null,
     val notes: String = ""
 )
 

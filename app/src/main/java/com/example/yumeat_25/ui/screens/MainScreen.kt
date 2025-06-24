@@ -46,7 +46,8 @@ fun MainScreen(
                     when (label) {
                         "Dati personali" -> navController.navigate("profile");
                         "Preferenze alimentari" -> navController.navigate("preferences");
-                        "Obiettivi" -> navController.navigate("goals")
+                        "Obiettivi" -> navController.navigate("goals");
+                        "Ricette consigliate" -> navController.navigate("recipes")
                         // add more cases for other labels if needed
                     }
                     scope.launch { drawerState.close() }
