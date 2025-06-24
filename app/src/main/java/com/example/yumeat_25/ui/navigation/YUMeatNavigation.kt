@@ -73,7 +73,21 @@ fun YUMeatNavigation(
         }
 
         composable("profile") {
-            ProfileScreen(
+            PersonalDataScreen(
+                navController = navController,
+                userProfileRepository = userProfileRepository
+            )
+        }
+
+        composable("goals") {
+            GoalsScreen(
+                navController = navController,
+                userProfileRepository = userProfileRepository
+            )
+        }
+
+        composable("preferences") {
+            DietaryPreferencesScreen(
                 navController = navController,
                 userProfileRepository = userProfileRepository
             )
