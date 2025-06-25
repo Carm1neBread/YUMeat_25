@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.yumeat_25.data.UserProfileRepository
 import com.example.yumeat_25.data.MealRepository
+import com.example.yumeat_25.data.FoodRepository
 import com.example.yumeat_25.ui.screens.*
 import com.example.yumeat_25.ui.screens.onboarding.*
 
@@ -14,16 +15,18 @@ import com.example.yumeat_25.ui.screens.onboarding.*
 fun YUMeatNavigation(
     navController: NavHostController = rememberNavController()
 ) {
+    // Singletons for repositories (use remember so they're not recreated)
     val userProfileRepository = remember { UserProfileRepository() }
     val mealRepository = remember { MealRepository() }
-    val isFirstLaunch by userProfileRepository.isFirstLaunch.collectAsState()
+    val foodRepository = remember { FoodRepository() }
+    val userProfile by userProfileRepository.userProfile.collectAsState()
 
     // Used to pass Meal name between screens (safer than the entire object)
     var selectedMealName by remember { mutableStateOf<String?>(null) }
 
     NavHost(
         navController = navController,
-        startDestination = if (isFirstLaunch) "onboarding_welcome" else "main"
+        startDestination = if (!userProfile.isOnboardingComplete) "onboarding_welcome" else "main"
     ) {
         // Onboarding Flow
         composable("onboarding_welcome") {
@@ -67,11 +70,16 @@ fun YUMeatNavigation(
 
         // Main App
         composable("main") {
-            MainScreen(navController = navController)
+            MainScreen(
+                navController = navController,
+                userProfileRepository = userProfileRepository
+            )
         }
 
         composable("add_meal") {
             AddMealScreen(
+                userProfileRepository = userProfileRepository,
+                foodRepository = foodRepository,
                 onBack = { navController.popBackStack() },
                 onMealAdded = { navController.popBackStack() }
             )
@@ -118,7 +126,8 @@ fun YUMeatNavigation(
                 RecipeDetailScreen(
                     navController = navController,
                     mealName = mealName,
-                    mealRepository = mealRepository
+                    mealRepository = mealRepository,
+                    userProfileRepository = userProfileRepository // <-- add this!
                 )
             }
         }

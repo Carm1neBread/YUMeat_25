@@ -4,14 +4,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -21,26 +21,25 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMealScreen(
+    userProfileRepository: UserProfileRepository,
+    foodRepository: FoodRepository,
     onBack: () -> Unit,
     onMealAdded: () -> Unit
 ) {
-    var selectedMealType by remember { mutableStateOf<MealType?>(null) }
+    var selectedMealTime by remember { mutableStateOf("breakfast") }
     var searchQuery by remember { mutableStateOf("") }
-    var showAddFoodDialog by remember { mutableStateOf(false) }
+    var showAddFoodDialog by remember { mutableStateOf<Food?>(null) }
 
-    val foodRepository = remember { FoodRepository() }
-    val mealRepository = remember { MealRepository() }
     val foods by foodRepository.foods.collectAsState()
 
     val filteredFoods = remember(searchQuery, foods) {
         if (searchQuery.isEmpty()) foods else foodRepository.searchFoods(searchQuery)
     }
 
-    // Intervento 2: Campo "tipo di pasto" obbligatorio
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Aggiungi pasto") },
+                title = { Text("Aggiungi alimento") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Indietro")
@@ -55,25 +54,24 @@ fun AddMealScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            // Selezione tipo pasto (Intervento 2)
+            // Selezione pasto: colazione, pranzo, cena
             Text(
-                text = "Tipo di pasto *",
+                text = "A quale pasto vuoi aggiungere? *",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                MealType.values().forEach { mealType ->
+                listOf("breakfast" to "Colazione", "lunch" to "Pranzo", "dinner" to "Cena").forEach { (key, label) ->
                     FilterChip(
-                        onClick = { selectedMealType = mealType },
-                        label = { Text(mealType.displayName) },
-                        selected = selectedMealType == mealType,
+                        onClick = { selectedMealTime = key },
+                        label = { Text(label) },
+                        selected = selectedMealTime == key,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -90,7 +88,6 @@ fun AddMealScreen(
                     .padding(bottom = 16.dp)
             )
 
-            // Food list
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -98,19 +95,11 @@ fun AddMealScreen(
                     FoodItem(
                         food = food,
                         onQuickAdd = {
-                            // Intervento 3: Aggiunta rapida
-                            selectedMealType?.let { mealType ->
-                                val meal = Meal(
-                                    id = UUID.randomUUID().toString(),
-                                    name = food.name,
-                                    type = mealType
-                                )
-                                mealRepository.addMeal(meal)
-                                onMealAdded()
-                            }
+                            userProfileRepository.addFoodToMeal(food, selectedMealTime)
+                            onMealAdded()
                         },
-                        onDetailAdd = { showAddFoodDialog = true },
-                        canQuickAdd = selectedMealType != null
+                        onDetailAdd = { showAddFoodDialog = food },
+                        canQuickAdd = selectedMealTime.isNotBlank()
                     )
                 }
             }
@@ -118,20 +107,14 @@ fun AddMealScreen(
     }
 
     // Dialog per aggiunta dettagliata
-    if (showAddFoodDialog) {
+    if (showAddFoodDialog != null) {
         AddFoodDetailDialog(
-            onDismiss = { showAddFoodDialog = false },
-            onConfirm = { foodName, notes ->
-                selectedMealType?.let { mealType ->
-                    val meal = Meal(
-                        id = UUID.randomUUID().toString(),
-                        name = foodName,
-                        type = mealType,
-                        notes = notes
-                    )
-                    mealRepository.addMeal(meal)
-                    onMealAdded()
-                }
+            defaultFood = showAddFoodDialog!!,
+            onDismiss = { showAddFoodDialog = null },
+            onConfirm = { food, notes ->
+                // For now, notes are ignored, but you can extend Food to include notes if desired.
+                userProfileRepository.addFoodToMeal(food, selectedMealTime)
+                onMealAdded()
             }
         )
     }
@@ -160,13 +143,17 @@ fun FoodItem(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = food.category,
+                    text = food.type.displayName,
                     fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "${food.calories} kcal • C: ${food.carbs}g P: ${food.protein}g F: ${food.fat}g",
+                    fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
-            // Intervento 3: Pulsante aggiunta rapida
             if (canQuickAdd) {
                 IconButton(
                     onClick = onQuickAdd,
@@ -189,10 +176,11 @@ fun FoodItem(
 
 @Composable
 fun AddFoodDetailDialog(
+    defaultFood: Food,
     onDismiss: () -> Unit,
-    onConfirm: (String, String) -> Unit
+    onConfirm: (Food, String) -> Unit
 ) {
-    var foodName by remember { mutableStateOf("") }
+    var foodName by remember { mutableStateOf(defaultFood.name) }
     var notes by remember { mutableStateOf("") }
 
     AlertDialog(
@@ -208,18 +196,26 @@ fun AddFoodDetailDialog(
                         .fillMaxWidth()
                         .padding(bottom = 8.dp)
                 )
-
                 OutlinedTextField(
                     value = notes,
                     onValueChange = { notes = it },
                     label = { Text("Note (opzionale)") },
                     modifier = Modifier.fillMaxWidth()
                 )
+                // Mostra i valori nutrizionali (solo visualizzazione)
+                Text(
+                    text = "${defaultFood.calories} kcal • C: ${defaultFood.carbs}g P: ${defaultFood.protein}g F: ${defaultFood.fat}g",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
             }
         },
         confirmButton = {
             TextButton(
-                onClick = { onConfirm(foodName, notes) },
+                onClick = {
+                    onConfirm(defaultFood.copy(name = foodName), notes)
+                },
                 enabled = foodName.isNotBlank()
             ) {
                 Text("Aggiungi")

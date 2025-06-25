@@ -8,9 +8,6 @@ class UserProfileRepository {
     private val _userProfile = MutableStateFlow(UserProfile())
     val userProfile: StateFlow<UserProfile> = _userProfile.asStateFlow()
 
-    private val _isFirstLaunch = MutableStateFlow(true)
-    val isFirstLaunch: StateFlow<Boolean> = _isFirstLaunch.asStateFlow()
-
     fun updatePersonalData(personalData: PersonalData) {
         _userProfile.value = _userProfile.value.copy(personalData = personalData)
     }
@@ -25,6 +22,28 @@ class UserProfileRepository {
 
     fun completeOnboarding() {
         _userProfile.value = _userProfile.value.copy(isOnboardingComplete = true)
-        _isFirstLaunch.value = false
+    }
+
+    fun addFoodToMeal(food: Food, meal: String) {
+        _userProfile.value = when (meal) {
+            "breakfast" -> _userProfile.value.copy(breakfast = _userProfile.value.breakfast + food)
+            "lunch" -> _userProfile.value.copy(lunch = _userProfile.value.lunch + food)
+            "dinner" -> _userProfile.value.copy(dinner = _userProfile.value.dinner + food)
+            else -> _userProfile.value
+        }
+    }
+
+    fun addMealToMealTime(meal: Meal, mealTime: String) {
+        // Convert Meal to Food
+        val food = Food(
+            id = meal.id,
+            name = meal.name,
+            type = meal.type,
+            calories = meal.calories,
+            carbs = meal.carbs,
+            protein = meal.protein,
+            fat = meal.fat
+        )
+        addFoodToMeal(food, mealTime)
     }
 }

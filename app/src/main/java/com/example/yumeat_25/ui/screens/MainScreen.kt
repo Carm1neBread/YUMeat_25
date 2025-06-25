@@ -8,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,7 +30,8 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    navController: NavController
+    navController: NavController,
+    userProfileRepository: UserProfileRepository
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -44,11 +44,10 @@ fun MainScreen(
                 key = drawerOpenCount,
                 onItemClick = { label ->
                     when (label) {
-                        "Dati personali" -> navController.navigate("profile");
-                        "Preferenze alimentari" -> navController.navigate("preferences");
-                        "Obiettivi" -> navController.navigate("goals");
+                        "Dati personali" -> navController.navigate("profile")
+                        "Preferenze alimentari" -> navController.navigate("preferences")
+                        "Obiettivi" -> navController.navigate("goals")
                         "Ricette consigliate" -> navController.navigate("recipes")
-                        // add more cases for other labels if needed
                     }
                     scope.launch { drawerState.close() }
                 },
@@ -56,25 +55,25 @@ fun MainScreen(
             )
         }
     ) {
-        val mealRepository = remember { MealRepository() }
-        val meals by mealRepository.meals.collectAsState()
+        val userProfile by userProfileRepository.userProfile.collectAsState()
 
-        // Replace these with your real data
-        val kcalGoal = 1200
-        val kcalRemaining = 572
-        val carbs = 128
-        val carbsGoal = 262
-        val protein = 78
-        val proteinGoal = 121
-        val fat = 54
-        val fatGoal = 60
+        val kcalGoal = userProfile.caloriesGoal
+        val carbsGoal = userProfile.carbsGoal
+        val proteinGoal = userProfile.proteinGoal
+        val fatGoal = userProfile.fatGoal
 
-        val todaysMeals = listOf(
-            Triple("Latte", "250 ml", "98 kcal"),
-            Triple("Pasta", "86 g", "237 kcal"),
-            Triple("Petto di pollo", "110 g", "130 kcal"),
-            Triple("Mandorle", "20 g", "110 kcal"),
-            Triple("Olio Evo", "20 g", "160 kcal"),
+        val currentCalories = userProfile.getCurrentCalories()
+        val currentCarbs = userProfile.getCurrentCarbs()
+        val currentProtein = userProfile.getCurrentProtein()
+        val currentFat = userProfile.getCurrentFat()
+
+        val kcalRemaining = (kcalGoal - currentCalories).coerceAtLeast(0)
+
+        // For meal lists, e.g. breakfast, lunch, dinner
+        val mealsList = listOf(
+            "Colazione" to userProfile.breakfast,
+            "Pranzo" to userProfile.lunch,
+            "Cena" to userProfile.dinner
         )
 
         // Date
@@ -162,7 +161,7 @@ fun MainScreen(
                                 .size(150.dp)
                         ) {
                             SemiCircularProgressBar(
-                                progress = kcalRemaining / kcalGoal.toFloat(),
+                                progress = currentCalories / kcalGoal.toFloat(),
                                 modifier = Modifier.size(140.dp),
                                 strokeWidth = 18f,
                                 backgroundColor = Color(0x22000000),
@@ -170,7 +169,7 @@ fun MainScreen(
                             )
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
-                                    text = "$kcalRemaining",
+                                    text = "$currentCalories",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 30.sp,
                                     color = Color.Black
@@ -183,7 +182,7 @@ fun MainScreen(
                                     textAlign = TextAlign.Center
                                 )
                                 Text(
-                                    text = "Rimanenti",
+                                    text = "Consumate",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp,
                                     color = Color.Gray,
@@ -198,9 +197,9 @@ fun MainScreen(
                                 .padding(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            MacroSummary("Carboidrati", carbs, carbsGoal, Modifier.weight(1f))
-                            MacroSummary("Proteine", protein, proteinGoal, Modifier.weight(1f))
-                            MacroSummary("Grassi", fat, fatGoal, Modifier.weight(1f))
+                            MacroSummary("Carboidrati", currentCarbs, carbsGoal, Modifier.weight(1f))
+                            MacroSummary("Proteine", currentProtein, proteinGoal, Modifier.weight(1f))
+                            MacroSummary("Grassi", currentFat, fatGoal, Modifier.weight(1f))
                         }
                     }
                 }
@@ -228,36 +227,47 @@ fun MainScreen(
                             color = Color.Black,
                             modifier = Modifier.padding(start = 8.dp, bottom = 6.dp)
                         )
-                        todaysMeals.forEach { (name, qty, kcal) ->
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp, vertical = 2.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = name,
-                                        fontSize = 15.sp,
-                                        color = Color.Black
-                                    )
-                                    Text(
-                                        text = qty,
-                                        fontSize = 12.sp,
-                                        color = Color.Gray
-                                    )
-                                }
+                        mealsList.forEach { (mealName, foods) ->
+                            if (foods.isNotEmpty()) {
                                 Text(
-                                    text = kcal,
-                                    fontSize = 15.sp,
+                                    text = mealName,
                                     fontWeight = FontWeight.Medium,
-                                    color = Color.Black
+                                    color = Color.Black,
+                                    fontSize = 15.sp,
+                                    modifier = Modifier.padding(vertical = 2.dp, horizontal = 4.dp)
                                 )
+                                foods.forEach { food ->
+                                    Row(
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 8.dp, vertical = 2.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = food.name,
+                                                fontSize = 15.sp,
+                                                color = Color.Black
+                                            )
+                                            Text(
+                                                text = food.type.displayName,
+                                                fontSize = 12.sp,
+                                                color = Color.Gray
+                                            )
+                                        }
+                                        Text(
+                                            text = "${food.calories} kcal",
+                                            fontSize = 15.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = Color.Black
+                                        )
+                                    }
+                                }
                             }
                         }
                         // Dettagli link
                         Text(
-                            text = "Dettagli",
+                            text = "Aggiungi",
                             color = Color.Gray,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier

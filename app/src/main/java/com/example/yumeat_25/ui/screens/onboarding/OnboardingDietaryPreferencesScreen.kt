@@ -42,8 +42,8 @@ fun OnboardingDietaryPreferencesScreen(
         // Header row with back
         Row(
             modifier = Modifier
-                .fillMaxWidth().
-                padding(top=16.dp),
+                .fillMaxWidth()
+                .padding(top = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
@@ -82,88 +82,100 @@ fun OnboardingDietaryPreferencesScreen(
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
 
-        // Tipo di alimentazione
-        Column(
+        // Tipo di alimentazione -- CARD with elevation
+        Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
-                .background(Color(0xFFF3F3F3))
-                .padding(vertical = 12.dp, horizontal = 8.dp)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            Text(
-                text = "Tipo di alimentazione",
-                fontWeight = FontWeight.Bold,
-                fontSize = 15.sp,
-                modifier = Modifier.padding(start = 12.dp, top = 4.dp, bottom = 6.dp)
-            )
-            alimentationOptions.forEach { option ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 2.dp)
-                        .height(48.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(Color.Transparent)
-                        .padding(horizontal = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = option,
-                        fontSize = 17.sp,
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp, horizontal = 8.dp)
+            ) {
+                Text(
+                    text = "Tipo di alimentazione",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(start = 12.dp, top = 4.dp, bottom = 6.dp)
+                )
+                alimentationOptions.forEach { option ->
+                    Row(
                         modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 12.dp)
-                    )
-                    RadioButton(
-                        selected = alimentation == option,
-                        onClick = { alimentation = option },
-                        colors = RadioButtonDefaults.colors(
-                            selectedColor = Color(0xFF000000),
-                            unselectedColor = Color(0xFF000000),
-                            disabledSelectedColor = Color.Gray,
-                            disabledUnselectedColor = Color.LightGray
+                            .fillMaxWidth()
+                            .padding(vertical = 2.dp)
+                            .height(48.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(Color.Transparent)
+                            .padding(horizontal = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = option,
+                            fontSize = 17.sp,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(start = 12.dp)
                         )
-                    )
+                        RadioButton(
+                            selected = alimentation == option,
+                            onClick = { alimentation = option },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = Color(0xFF000000),
+                                unselectedColor = Color(0xFF000000),
+                                disabledSelectedColor = Color.Gray,
+                                disabledUnselectedColor = Color.LightGray
+                            )
+                        )
+                    }
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(22.dp))
 
-        // Alimenti da evitare
-        Column(
+        // Alimenti da evitare -- CARD with elevation
+        Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
-                .background(Color(0xFFF3F3F3))
-                .padding(vertical = 12.dp, horizontal = 8.dp)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            Text(
-                text = "Alimenti da evitare",
-                fontWeight = FontWeight.Bold,
-                fontSize = 15.sp,
-                modifier = Modifier.padding(start = 12.dp, top = 4.dp, bottom = 6.dp)
-            )
-            AvoidItem(
-                label = "Carne rossa",
-                checked = avoidCarneRossa,
-                onCheckedChange = { avoidCarneRossa = it }
-            )
-            AvoidItem(
-                label = "Latticini",
-                checked = avoidLatticini,
-                onCheckedChange = { avoidLatticini = it }
-            )
-            AvoidItem(
-                label = "Glutine",
-                checked = avoidGlutine,
-                onCheckedChange = { avoidGlutine = it }
-            )
-            AvoidItem(
-                label = "Zucchero",
-                checked = avoidZucchero,
-                onCheckedChange = { avoidZucchero = it }
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp, horizontal = 8.dp)
+            ) {
+                Text(
+                    text = "Alimenti da evitare",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(start = 12.dp, top = 4.dp, bottom = 6.dp)
+                )
+                AvoidItem(
+                    label = "Carne rossa",
+                    checked = avoidCarneRossa,
+                    onCheckedChange = { avoidCarneRossa = it }
+                )
+                AvoidItem(
+                    label = "Latticini",
+                    checked = avoidLatticini,
+                    onCheckedChange = { avoidLatticini = it }
+                )
+                AvoidItem(
+                    label = "Glutine",
+                    checked = avoidGlutine,
+                    onCheckedChange = { avoidGlutine = it }
+                )
+                AvoidItem(
+                    label = "Zucchero",
+                    checked = avoidZucchero,
+                    onCheckedChange = { avoidZucchero = it }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.weight(1f))
