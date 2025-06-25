@@ -110,43 +110,49 @@ fun GoalsScreen(
                 textAlign = TextAlign.Center
             )
 
-            // Options in a rounded grey wrapper
-            Column(
+            // Options in a rounded grey wrapper -- now as Card with elevation
+            Card(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color(0xFFF3F3F3))
-                    .padding(vertical = 12.dp, horizontal = 8.dp)
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                goalOptions.forEach { option ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 2.dp)
-                            .height(48.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(Color.Transparent)
-                            .padding(horizontal = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = option,
-                            fontSize = 17.sp,
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp, horizontal = 8.dp)
+                ) {
+                    goalOptions.forEach { option ->
+                        Row(
                             modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 12.dp)
-                        )
-                        RadioButton(
-                            selected = selectedGoal == option,
-                            onClick = { if (editMode) selectedGoal = option },
-                            enabled = editMode,
-                            colors = RadioButtonDefaults.colors(
-                                selectedColor = Color(0xFF000000),
-                                unselectedColor = Color(0xFF000000),
-                                disabledSelectedColor = Color.Gray,
-                                disabledUnselectedColor = Color.LightGray
+                                .fillMaxWidth()
+                                .padding(vertical = 2.dp)
+                                .height(48.dp)
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(Color.Transparent)
+                                .padding(horizontal = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = option,
+                                fontSize = 17.sp,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 12.dp)
                             )
-                        )
+                            RadioButton(
+                                selected = selectedGoal == option,
+                                onClick = { if (editMode) selectedGoal = option },
+                                enabled = editMode,
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = Color(0xFF000000),
+                                    unselectedColor = Color(0xFF000000),
+                                    disabledSelectedColor = Color.Gray,
+                                    disabledUnselectedColor = Color.LightGray
+                                )
+                            )
+                        }
                     }
                 }
             }

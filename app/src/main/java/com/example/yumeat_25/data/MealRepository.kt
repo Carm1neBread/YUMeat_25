@@ -10,7 +10,11 @@ class MealRepository {
         Meal(
             id = "1",
             name = "Toast tris",
-            type = MealType.LUNCH,
+            type = FoodType.ONNIVORE,
+            calories = 420,
+            carbs = 45,
+            protein = 24,
+            fat = 18,
             imageRes = R.drawable.toast_tris,
             emoji = "\uD83E\uDD69",
             ingredientTitles = listOf("Toast 1", "Toast 2", "Toast 3"),
@@ -24,31 +28,51 @@ class MealRepository {
         Meal(
             id = "2",
             name = "Pasta primavera",
-            type = MealType.LUNCH,
+            type = FoodType.VEGETARIAN,
+            calories = 350,
+            carbs = 60,
+            protein = 12,
+            fat = 8,
             emoji = "\uD83C\uDF31"
         ),
         Meal(
             id = "3",
             name = "Poke",
-            type = MealType.LUNCH,
+            type = FoodType.ONNIVORE,
+            calories = 480,
+            carbs = 55,
+            protein = 22,
+            fat = 17,
             emoji = "\uD83E\uDD69"
         ),
         Meal(
             id = "4",
             name = "Cesar salad",
-            type = MealType.LUNCH,
+            type = FoodType.VEGETARIAN,
+            calories = 310,
+            carbs = 12,
+            protein = 12,
+            fat = 20,
             emoji = "\uD83C\uDF31"
         ),
         Meal(
             id = "5",
             name = "Hamburger",
-            type = MealType.LUNCH,
+            type = FoodType.ONNIVORE,
+            calories = 550,
+            carbs = 40,
+            protein = 29,
+            fat = 32,
             emoji = "\uD83E\uDD69"
         ),
         Meal(
             id = "6",
             name = "Macedonia di frutta",
-            type = MealType.SNACK,
+            type = FoodType.VEGAN,
+            calories = 120,
+            carbs = 28,
+            protein = 2,
+            fat = 0,
             emoji = "\uD83C\uDF31"
         )
     )
@@ -60,14 +84,8 @@ class MealRepository {
         _meals.value = _meals.value + meal
     }
 
-    fun getMealsByType(type: MealType): List<Meal> {
+    fun getMealsByType(type: FoodType): List<Meal> {
         return _meals.value.filter { it.type == type }
-    }
-
-    fun getTodaysMeals(): List<Meal> {
-        val today = System.currentTimeMillis()
-        val startOfDay = today - (today % (24 * 60 * 60 * 1000))
-        return _meals.value.filter { it.timestamp >= startOfDay }
     }
 
     fun getMealByName(mealName: String): Meal? {
