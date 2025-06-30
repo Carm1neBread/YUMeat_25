@@ -15,14 +15,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.foundation.border
+import androidx.compose.ui.draw.drawBehind
+import kotlin.math.min
+import androidx.compose.ui.graphics.drawscope.Stroke
 
 @Composable
 fun ChallengeScreen(
@@ -66,13 +69,14 @@ fun ChallengeScreen(
     // Track which challenge is currently expanded (by index)
     var expandedIndex by remember { mutableStateOf<Int?>(null) }
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(horizontal = 16.dp)
     ) {
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(50.dp))
         // Top bar with back, title, and star
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -90,10 +94,7 @@ fun ChallengeScreen(
                 modifier = Modifier,
                 color = Color.Black
             )
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { /* TODO: handle star click */ }) {
-                Icon(Icons.Filled.Star, contentDescription = "Preferiti", tint = Color.Black)
-            }
+            Spacer(modifier = Modifier.weight(1.5f))
         }
         Spacer(modifier = Modifier.height(8.dp))
         // Tabs
@@ -149,7 +150,7 @@ fun ChallengeCard(
     onClick: () -> Unit,
 ) {
     val gradient = Brush.horizontalGradient(
-        colors = listOf(Color(0xFF295B4F), Color(0xFFE8E8E8)),
+        colors = listOf(Color(0xFF295B4F), Color(0xFFC9C9C9)),
         startX = 0f,
         endX = 600f
     )
@@ -174,27 +175,8 @@ fun ChallengeCard(
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(Modifier.width(12.dp))
-                // Progress circle
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.0f))
-                        .border(
-                            width = 2.dp,
-                            color = Color.Black,
-                            shape = CircleShape
-                        )
-                ) {
-                    Text(
-                        text = challenge.progress,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                // Progress circle with animated arc fill
+                ChallengeProgressCircle(progressString = challenge.progress)
             }
             AnimatedVisibility(
                 visible = expanded,
@@ -211,5 +193,48 @@ fun ChallengeCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun ChallengeProgressCircle(progressString: String) {
+    // Parse the progress string, fallback to 0/1 if parsing fails
+    val (current, total) = remember(progressString) {
+        val parts = progressString.split('/')
+        val current = parts.getOrNull(0)?.toIntOrNull() ?: 0
+        val total = parts.getOrNull(1)?.toIntOrNull() ?: 1
+        current.coerceAtMost(total) to total.coerceAtLeast(1)
+    }
+    val progress = current.toFloat() / total.toFloat()
+
+    Box(
+        modifier = Modifier
+            .size(40.dp)
+            .clip(CircleShape)
+            .drawBehind {
+                // Background ring
+                drawCircle(
+                    color = Color.White,
+                    radius = size.minDimension / 2f
+                )
+                // Progress arc
+                drawArc(
+                    color = Color(0xFF000000), // green
+                    startAngle = -90f,
+                    sweepAngle = 360f * progress,
+                    useCenter = false,
+                    style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round)
+                )
+                // Outer border
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "$current/$total",
+            color = Color.Black,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center
+        )
     }
 }
