@@ -48,6 +48,8 @@ fun MainScreen(
                         "Preferenze alimentari" -> navController.navigate("preferences")
                         "Obiettivi" -> navController.navigate("goals")
                         "Ricette consigliate" -> navController.navigate("recipes")
+                        "Motivazione" -> navController.navigate("motivation")
+                        "Aiuto" -> navController.navigate("help")
                     }
                     scope.launch { drawerState.close() }
                 },
@@ -206,7 +208,7 @@ fun MainScreen(
 
                 Spacer(Modifier.height(30.dp))
 
-                // List of meals
+                // Card: Cosa hai mangiato (NEW LOGIC)
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -228,52 +230,47 @@ fun MainScreen(
                             modifier = Modifier.padding(start = 8.dp, bottom = 6.dp)
                         )
                         mealsList.forEach { (mealName, foods) ->
-                            if (foods.isNotEmpty()) {
+                            val totalCalories = foods.sumOf { it.calories }
+                            val totalCarbs = foods.sumOf { it.carbs }
+                            val totalProtein = foods.sumOf { it.protein }
+                            val totalFat = foods.sumOf { it.fat }
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 6.dp, horizontal = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Text(
                                     text = mealName,
                                     fontWeight = FontWeight.Medium,
                                     color = Color.Black,
-                                    fontSize = 15.sp,
-                                    modifier = Modifier.padding(vertical = 2.dp, horizontal = 4.dp)
+                                    fontSize = 15.sp
                                 )
-                                foods.forEach { food ->
-                                    Row(
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 8.dp, vertical = 2.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(
-                                                text = food.name,
-                                                fontSize = 15.sp,
-                                                color = Color.Black
-                                            )
-                                            Text(
-                                                text = food.type.displayName,
-                                                fontSize = 12.sp,
-                                                color = Color.Gray
-                                            )
-                                        }
-                                        Text(
-                                            text = "${food.calories} kcal",
-                                            fontSize = 15.sp,
-                                            fontWeight = FontWeight.Medium,
-                                            color = Color.Black
-                                        )
-                                    }
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(
+                                        text = "$totalCalories kcal",
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Black,
+                                        fontSize = 14.sp
+                                    )
+                                    Text(
+                                        text = "C:${totalCarbs}g P:${totalProtein}g F:${totalFat}g",
+                                        color = Color.Gray,
+                                        fontSize = 13.sp
+                                    )
                                 }
                             }
                         }
-                        // Dettagli link
+                        // Dettagli link (NEW LOGIC: navigates to meal_details)
                         Text(
-                            text = "Aggiungi",
+                            text = "Dettagli",
                             color = Color.Gray,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
                                 .padding(top = 12.dp)
-                                .clickable { navController.navigate("add_meal") }
+                                .clickable { navController.navigate("meal_details") }
                         )
                     }
                 }
