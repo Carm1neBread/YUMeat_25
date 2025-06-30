@@ -127,13 +127,42 @@ fun YUMeatNavigation(
                     navController = navController,
                     mealName = mealName,
                     mealRepository = mealRepository,
-                    userProfileRepository = userProfileRepository // <-- add this!
+                    userProfileRepository = userProfileRepository
                 )
             }
         }
 
         composable("education") {
             EducationScreen(onBack = { navController.popBackStack() })
+        }
+
+        // --- NEW: Meal Details Screen for all added foods ---
+        composable("meal_details") {
+            MealDetailsScreen(
+                navController = navController,
+                userProfileRepository = userProfileRepository
+            )
+        }
+
+        // --- NEW: Motivation Screen ---
+        composable("motivation") {
+            MotivationScreen(
+                navController = navController
+            )
+        }
+
+        // --- NEW: Help Screen ---
+        composable("help") {
+            HelpScreen(
+                navController = navController
+            )
+        }
+
+        // --- NEW: Challenge Screen ---
+        composable("challenge") {
+            ChallengeScreen(
+                navController = navController
+            )
         }
     }
 }
