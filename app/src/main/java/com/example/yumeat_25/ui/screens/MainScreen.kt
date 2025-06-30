@@ -50,6 +50,7 @@ fun MainScreen(
                         "Ricette consigliate" -> navController.navigate("recipes")
                         "Motivazione" -> navController.navigate("motivation")
                         "Aiuto" -> navController.navigate("help")
+                        "Challenge" -> navController.navigate("challenge")
                     }
                     scope.launch { drawerState.close() }
                 },
