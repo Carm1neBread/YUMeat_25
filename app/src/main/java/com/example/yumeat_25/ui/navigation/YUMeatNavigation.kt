@@ -164,5 +164,12 @@ fun YUMeatNavigation(
                 navController = navController
             )
         }
+
+        // --- NEW: Settings Screen ---
+        composable("settings") {
+            SettingsScreen(
+                navController = navController
+            )
+        }
     }
 }

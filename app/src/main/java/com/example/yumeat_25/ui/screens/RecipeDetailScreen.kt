@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.yumeat_25.R
-import com.example.yumeat_25.data.Meal
 import com.example.yumeat_25.data.MealRepository
 import com.example.yumeat_25.data.UserProfileRepository
 
