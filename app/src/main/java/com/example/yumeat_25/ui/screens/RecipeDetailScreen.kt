@@ -27,7 +27,8 @@ fun RecipeDetailScreen(
     navController: NavController,
     mealName: String,
     mealRepository: MealRepository,
-    userProfileRepository: UserProfileRepository
+    userProfileRepository: UserProfileRepository,
+    safeMode: Boolean = false // AGGIUNTO safeMode!
 ) {
     val meals by mealRepository.meals.collectAsState()
     val meal = meals.find { it.name == mealName }
@@ -110,30 +111,32 @@ fun RecipeDetailScreen(
                                 .align(Alignment.CenterHorizontally)
                         )
                         Spacer(Modifier.height(18.dp))
-                        // Nutritional info
-                        Text(
-                            text = "Valori nutrizionali",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text("Calorie: ${meal.calories} kcal", fontSize = 14.sp, color = Color(0xFF555555), fontWeight = FontWeight.Bold)
-                            Text("Carboidrati: ${meal.carbs}g", fontSize = 14.sp, color = Color(0xFF555555), fontWeight = FontWeight.Bold)
-                        }
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text("Proteine: ${meal.protein}g", fontSize = 14.sp, color = Color(0xFF555555), fontWeight = FontWeight.Bold)
-                            Text("Grassi: ${meal.fat}g", fontSize = 14.sp, color = Color(0xFF555555), fontWeight = FontWeight.Bold)
+                        // Nutritional info (mostra solo se NON safeMode)
+                        if (!safeMode) {
+                            Text(
+                                text = "Valori nutrizionali",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("Calorie: ${meal.calories} kcal", fontSize = 14.sp, color = Color(0xFF555555), fontWeight = FontWeight.Bold)
+                                Text("Carboidrati: ${meal.carbs}g", fontSize = 14.sp, color = Color(0xFF555555), fontWeight = FontWeight.Bold)
+                            }
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("Proteine: ${meal.protein}g", fontSize = 14.sp, color = Color(0xFF555555), fontWeight = FontWeight.Bold)
+                                Text("Grassi: ${meal.fat}g", fontSize = 14.sp, color = Color(0xFF555555), fontWeight = FontWeight.Bold)
+                            }
                         }
                         // Ingredienti
                         Text(

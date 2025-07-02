@@ -78,7 +78,7 @@ fun YUMeatNavigation(
             )
         }
 
-        // ROUTE MODIFICATA: add_meal con parametro safeMode
+        // Add meal route - SafeMode aware
         composable(
             route = "add_meal?safeMode={safeMode}",
             arguments = listOf(navArgument("safeMode") {
@@ -104,7 +104,6 @@ fun YUMeatNavigation(
             }
         }
 
-        // Altre schermate
         composable("profile") {
             PersonalDataScreen(
                 navController = navController,
@@ -130,24 +129,42 @@ fun YUMeatNavigation(
             WellnessDiaryScreen(onBack = { navController.popBackStack() })
         }
 
-        composable("recipes") {
+        // Ricette - SafeMode aware
+        composable(
+            route = "recipes?safeMode={safeMode}",
+            arguments = listOf(navArgument("safeMode") {
+                type = NavType.StringType
+                defaultValue = "false"
+            })
+        ) { backStackEntry ->
+            val safeMode = backStackEntry.arguments?.getString("safeMode") == "true"
             RecipesScreen(
                 navController = navController,
                 mealRepository = mealRepository,
                 onRecipeClick = { meal ->
                     selectedMealName = meal.name
-                    navController.navigate("recipe_detail")
-                }
+                    navController.navigate("recipe_detail?safeMode=$safeMode")
+                },
+                safeMode = safeMode
             )
         }
 
-        composable("recipe_detail") {
+        // Dettaglio ricetta estende la logica safeMode per RecipeDetailScreen se vuoi!
+        composable(
+            route = "recipe_detail?safeMode={safeMode}",
+            arguments = listOf(navArgument("safeMode") {
+                type = NavType.StringType
+                defaultValue = "false"
+            })
+        ) { backStackEntry ->
+            val safeMode = backStackEntry.arguments?.getString("safeMode") == "true"
             selectedMealName?.let { mealName ->
                 RecipeDetailScreen(
                     navController = navController,
                     mealName = mealName,
                     mealRepository = mealRepository,
-                    userProfileRepository = userProfileRepository
+                    userProfileRepository = userProfileRepository,
+                    safeMode = safeMode
                 )
             }
         }
@@ -156,7 +173,7 @@ fun YUMeatNavigation(
             EducationScreen(onBack = { navController.popBackStack() })
         }
 
-        // --- Meal Details Screen for all added foods ---
+        // Meal details route - SafeMode aware
         composable(
             route = "meal_details?safeMode={safeMode}",
             arguments = listOf(navArgument("safeMode") {
@@ -178,28 +195,24 @@ fun YUMeatNavigation(
             }
         }
 
-        // --- Motivation Screen ---
         composable("motivation") {
             MotivationScreen(
                 navController = navController
             )
         }
 
-        // --- Help Screen ---
         composable("help") {
             HelpScreen(
                 navController = navController
             )
         }
 
-        // --- Challenge Screen ---
         composable("challenge") {
             ChallengeScreen(
                 navController = navController
             )
         }
 
-        // --- Settings Screen ---
         composable("settings") {
             SettingsScreen(
                 navController = navController

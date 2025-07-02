@@ -26,7 +26,8 @@ import com.example.yumeat_25.data.FoodType
 fun RecipesScreen(
     navController: NavController,
     mealRepository: MealRepository,
-    onRecipeClick: (Meal) -> Unit = { }
+    onRecipeClick: (Meal) -> Unit = { },
+    safeMode: Boolean = false // <--- AGGIUNTO parametro
 ) {
     val meals by mealRepository.meals.collectAsState()
     var selectedTab by remember { mutableStateOf(FoodType.ONNIVORE) }
@@ -121,13 +122,15 @@ fun RecipesScreen(
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
-                                Text(
-                                    "${meal.calories} kcal • C: ${meal.carbs}g P: ${meal.protein}g F: ${meal.fat}g",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Gray,
-                                    modifier = Modifier.padding(top = 2.dp)
-                                )
+                                if (!safeMode) {
+                                    Text(
+                                        "${meal.calories} kcal • C: ${meal.carbs}g P: ${meal.protein}g F: ${meal.fat}g",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Gray,
+                                        modifier = Modifier.padding(top = 2.dp)
+                                    )
+                                }
                             }
                             Text(
                                 meal.emoji ?: "",
