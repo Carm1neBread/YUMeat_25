@@ -1,19 +1,20 @@
 package com.example.yumeat_25.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,8 +27,6 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.*
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
 import com.example.yumeat_25.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +38,7 @@ fun MainScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var drawerOpenCount by remember { mutableStateOf(0) }
+    var isSafeMode by rememberSaveable { mutableStateOf(false) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -50,7 +50,7 @@ fun MainScreen(
                         "Dati personali" -> navController.navigate("profile")
                         "Preferenze alimentari" -> navController.navigate("preferences")
                         "Obiettivi" -> navController.navigate("goals")
-                        "Ricette consigliate" -> navController.navigate("recipes")
+                        "Ricette consigliate" -> navController.navigate("recipes?safeMode=$isSafeMode")
                         "Motivazione" -> navController.navigate("motivation")
                         "Aiuto" -> navController.navigate("help")
                         "Challenge" -> navController.navigate("challenge")
@@ -74,16 +74,12 @@ fun MainScreen(
         val currentProtein = userProfile.getCurrentProtein()
         val currentFat = userProfile.getCurrentFat()
 
-        val kcalRemaining = (kcalGoal - currentCalories).coerceAtLeast(0)
-
-        // For meal lists, e.g. breakfast, lunch, dinner
         val mealsList = listOf(
             "Colazione" to userProfile.breakfast,
             "Pranzo" to userProfile.lunch,
             "Cena" to userProfile.dinner
         )
 
-        // Date
         val now = LocalDate.now()
         val dayOfWeek = now.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
         val month = now.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
@@ -129,10 +125,11 @@ fun MainScreen(
                             color = Color.Black
                         )
                     }
-                    IconButton(onClick = { /* Safe mode toggle */ }) {
+                    IconButton(onClick = { isSafeMode = !isSafeMode }) {
+                        val eyeIcon = if (isSafeMode) R.drawable.closedeye else R.drawable.openeye
                         Image(
-                            painter = painterResource(id = R.drawable.openeye),
-                            contentDescription = "Safe mode",
+                            painter = painterResource(id = eyeIcon),
+                            contentDescription = if (isSafeMode) "Safe mode attivo" else "Safe mode disattivo",
                             modifier = Modifier.size(30.dp)
                         )
                     }
@@ -140,152 +137,31 @@ fun MainScreen(
 
                 Spacer(Modifier.height(20.dp))
 
-                // Card: Riepilogo di oggi + SemiCircularProgressBar
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 2.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Riepilogo di oggi",
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 22.sp,
-                            color = Color.Black
-                        )
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .padding(top = 20.dp, bottom = 14.dp)
-                                .size(150.dp)
-                        ) {
-                            SemiCircularProgressBar(
-                                progress = currentCalories / kcalGoal.toFloat(),
-                                modifier = Modifier.size(140.dp),
-                                strokeWidth = 18f,
-                                backgroundColor = Color(0x22000000),
-                                progressColor = Color.Black
-                            )
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = "$currentCalories",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 30.sp,
-                                    color = Color.Black
-                                )
-                                Text(
-                                    text = "kcal",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 20.sp,
-                                    color = Color.Black,
-                                    textAlign = TextAlign.Center
-                                )
-                                Text(
-                                    text = "Consumate",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    color = Color.Gray,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
-                        // Macros: Carbs / Protein / Fat
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            MacroSummary("Carboidrati", currentCarbs, carbsGoal, Modifier.weight(1f))
-                            MacroSummary("Proteine", currentProtein, proteinGoal, Modifier.weight(1f))
-                            MacroSummary("Grassi", currentFat, fatGoal, Modifier.weight(1f))
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(30.dp))
-
-                // Card: Cosa hai mangiato (NEW LOGIC)
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 10.dp, horizontal = 8.dp)
-                    ) {
-                        Text(
-                            text = "Cosa hai mangiato",
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp,
-                            color = Color.Black,
-                            modifier = Modifier.padding(start = 8.dp, bottom = 6.dp)
-                        )
-                        mealsList.forEach { (mealName, foods) ->
-                            val totalCalories = foods.sumOf { it.calories }
-                            val totalCarbs = foods.sumOf { it.carbs }
-                            val totalProtein = foods.sumOf { it.protein }
-                            val totalFat = foods.sumOf { it.fat }
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 6.dp, horizontal = 8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = mealName,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color.Black,
-                                    fontSize = 15.sp
-                                )
-                                Column(horizontalAlignment = Alignment.End) {
-                                    Text(
-                                        text = "$totalCalories kcal",
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.Black,
-                                        fontSize = 14.sp
-                                    )
-                                    Text(
-                                        text = "C:${totalCarbs}g P:${totalProtein}g F:${totalFat}g",
-                                        color = Color.Gray,
-                                        fontSize = 13.sp
-                                    )
-                                }
-                            }
-                        }
-                        // Dettagli link (NEW LOGIC: navigates to meal_details)
-                        Text(
-                            text = "Dettagli",
-                            color = Color.Gray,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .padding(top = 12.dp)
-                                .clickable { navController.navigate("meal_details") }
-                        )
-                    }
+                if (isSafeMode) {
+                    SafeModeDashboard(
+                        mealsList = mealsList,
+                        onMealDetailsClick = { navController.navigate("meal_details?safeMode=true") }
+                    )
+                } else {
+                    NormalDashboard(
+                        kcalGoal = kcalGoal,
+                        carbsGoal = carbsGoal,
+                        proteinGoal = proteinGoal,
+                        fatGoal = fatGoal,
+                        currentCalories = currentCalories,
+                        currentCarbs = currentCarbs,
+                        currentProtein = currentProtein,
+                        currentFat = currentFat,
+                        mealsList = mealsList,
+                        onMealDetailsClick = { navController.navigate("meal_details") }
+                    )
                 }
 
                 Spacer(Modifier.weight(1f))
             }
 
-            // Floating Add Meal button (bottom left)
             FloatingActionButton(
-                onClick = { navController.navigate("add_meal") },
+                onClick = { navController.navigate("add_meal?safeMode=$isSafeMode") },
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .padding(start = 20.dp, bottom = 35.dp),
@@ -294,7 +170,6 @@ fun MainScreen(
                 Icon(Icons.Default.Add, contentDescription = "Aggiungi pasto", tint = Color.Black)
             }
 
-            // Floating AI Chat button (bottom right)
             FloatingActionButton(
                 onClick = { navController.navigate("ai_chat") },
                 modifier = Modifier
@@ -308,6 +183,159 @@ fun MainScreen(
                     modifier = Modifier.size(30.dp)
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun NormalDashboard(
+    kcalGoal: Int,
+    carbsGoal: Int,
+    proteinGoal: Int,
+    fatGoal: Int,
+    currentCalories: Int,
+    currentCarbs: Int,
+    currentProtein: Int,
+    currentFat: Int,
+    mealsList: List<Pair<String, List<Food>>>,
+    onMealDetailsClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 2.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Riepilogo di oggi",
+                fontWeight = FontWeight.Medium,
+                fontSize = 22.sp,
+                color = Color.Black
+            )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .padding(top = 20.dp, bottom = 14.dp)
+                    .size(150.dp)
+            ) {
+                SemiCircularProgressBar(
+                    progress = currentCalories / kcalGoal.toFloat(),
+                    modifier = Modifier.size(140.dp),
+                    strokeWidth = 18f,
+                    backgroundColor = Color(0x22000000),
+                    progressColor = Color.Black
+                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "$currentCalories",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 30.sp,
+                        color = Color.Black
+                    )
+                    Text(
+                        text = "kcal",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = Color.Black,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = "Consumate",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                MacroSummary("Carboidrati", currentCarbs, carbsGoal, Modifier.weight(1f))
+                MacroSummary("Proteine", currentProtein, proteinGoal, Modifier.weight(1f))
+                MacroSummary("Grassi", currentFat, fatGoal, Modifier.weight(1f))
+            }
+        }
+    }
+
+    Spacer(Modifier.height(30.dp))
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp, horizontal = 8.dp)
+        ) {
+            Text(
+                text = "Cosa hai mangiato",
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp,
+                color = Color.Black,
+                modifier = Modifier.padding(start = 8.dp, bottom = 6.dp)
+            )
+            mealsList.forEach { (mealName, foods) ->
+                Column(Modifier.padding(vertical = 6.dp, horizontal = 8.dp)) {
+                    Text(
+                        text = mealName,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Black,
+                        fontSize = 15.sp
+                    )
+                    if (foods.isEmpty()) {
+                        Text(
+                            text = "Nessun alimento aggiunto",
+                            color = Color.Gray,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(start = 16.dp, top = 2.dp)
+                        )
+                    } else {
+                        val totalCalories = foods.sumOf { it.calories }
+                        val totalCarbs = foods.sumOf { it.carbs }
+                        val totalProtein = foods.sumOf { it.protein }
+                        val totalFat = foods.sumOf { it.fat }
+                        foods.forEach { food ->
+                            Text(
+                                text = food.name,
+                                fontSize = 15.sp,
+                                modifier = Modifier.padding(start = 16.dp, top = 2.dp, bottom = 2.dp)
+                            )
+                        }
+                        Text(
+                            text = "$totalCalories kcal | C:${totalCarbs}g P:${totalProtein}g F:${totalFat}g",
+                            color = Color.Gray,
+                            fontSize = 13.sp,
+                            modifier = Modifier.padding(start = 16.dp, top = 2.dp)
+                        )
+                    }
+                }
+            }
+            Text(
+                text = "Dettagli",
+                color = Color.Gray,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 12.dp)
+                    .clickable { onMealDetailsClick() }
+            )
         }
     }
 }

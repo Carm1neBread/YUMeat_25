@@ -5,6 +5,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.yumeat_25.data.UserProfileRepository
 import com.example.yumeat_25.data.MealRepository
 import com.example.yumeat_25.data.FoodRepository
@@ -76,15 +78,33 @@ fun YUMeatNavigation(
             )
         }
 
-        composable("add_meal") {
-            AddMealScreen(
-                userProfileRepository = userProfileRepository,
-                foodRepository = foodRepository,
-                onBack = { navController.popBackStack() },
-                onMealAdded = { navController.popBackStack() }
-            )
+        // ROUTE MODIFICATA: add_meal con parametro safeMode
+        composable(
+            route = "add_meal?safeMode={safeMode}",
+            arguments = listOf(navArgument("safeMode") {
+                type = NavType.StringType
+                defaultValue = "false"
+            })
+        ) { backStackEntry ->
+            val safeMode = backStackEntry.arguments?.getString("safeMode") == "true"
+            if (safeMode) {
+                AddMealSafeMode(
+                    userProfileRepository = userProfileRepository,
+                    foodRepository = foodRepository,
+                    onBack = { navController.popBackStack() },
+                    onMealAdded = { navController.popBackStack() }
+                )
+            } else {
+                AddMealScreen(
+                    userProfileRepository = userProfileRepository,
+                    foodRepository = foodRepository,
+                    onBack = { navController.popBackStack() },
+                    onMealAdded = { navController.popBackStack() }
+                )
+            }
         }
 
+        // Altre schermate
         composable("profile") {
             PersonalDataScreen(
                 navController = navController,
@@ -136,36 +156,50 @@ fun YUMeatNavigation(
             EducationScreen(onBack = { navController.popBackStack() })
         }
 
-        // --- NEW: Meal Details Screen for all added foods ---
-        composable("meal_details") {
-            MealDetailsScreen(
-                navController = navController,
-                userProfileRepository = userProfileRepository
-            )
+        // --- Meal Details Screen for all added foods ---
+        composable(
+            route = "meal_details?safeMode={safeMode}",
+            arguments = listOf(navArgument("safeMode") {
+                type = NavType.StringType
+                defaultValue = "false"
+            })
+        ) { backStackEntry ->
+            val safeMode = backStackEntry.arguments?.getString("safeMode") == "true"
+            if (safeMode) {
+                MealDetailsSafeMode(
+                    navController = navController,
+                    userProfileRepository = userProfileRepository
+                )
+            } else {
+                MealDetailsScreen(
+                    navController = navController,
+                    userProfileRepository = userProfileRepository
+                )
+            }
         }
 
-        // --- NEW: Motivation Screen ---
+        // --- Motivation Screen ---
         composable("motivation") {
             MotivationScreen(
                 navController = navController
             )
         }
 
-        // --- NEW: Help Screen ---
+        // --- Help Screen ---
         composable("help") {
             HelpScreen(
                 navController = navController
             )
         }
 
-        // --- NEW: Challenge Screen ---
+        // --- Challenge Screen ---
         composable("challenge") {
             ChallengeScreen(
                 navController = navController
             )
         }
 
-        // --- NEW: Settings Screen ---
+        // --- Settings Screen ---
         composable("settings") {
             SettingsScreen(
                 navController = navController
