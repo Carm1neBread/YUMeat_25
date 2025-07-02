@@ -26,6 +26,9 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.*
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.example.yumeat_25.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -111,7 +114,7 @@ fun MainScreen(
                             drawerState.open()
                         }
                     }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu")
+                        Icon(Icons.Default.Menu, contentDescription = "Menu", modifier = Modifier.size(30.dp))
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
@@ -127,10 +130,10 @@ fun MainScreen(
                         )
                     }
                     IconButton(onClick = { /* Safe mode toggle */ }) {
-                        Icon(
-                            Icons.Default.Lock,
+                        Image(
+                            painter = painterResource(id = R.drawable.openeye),
                             contentDescription = "Safe mode",
-                            tint = Color.Black
+                            modifier = Modifier.size(30.dp)
                         )
                     }
                 }
@@ -299,7 +302,11 @@ fun MainScreen(
                     .padding(end = 20.dp, bottom = 35.dp),
                 containerColor = Color.White
             ) {
-                Icon(Icons.Default.Send, contentDescription = "AI Chat", tint = Color.Black)
+                Image(
+                    painter = painterResource(id = R.drawable.ai),
+                    contentDescription = "AI Chat",
+                    modifier = Modifier.size(30.dp)
+                )
             }
         }
     }
