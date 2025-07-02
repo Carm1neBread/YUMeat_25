@@ -9,10 +9,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.yumeat_25.R
+import androidx.compose.foundation.Image
 
 @Composable
 fun DrawerMenuContent(
@@ -46,7 +48,7 @@ fun DrawerMenuContent(
         DrawerMenuSection(
             expanded = profiloExpanded,
             label = "Profilo",
-            icon = Icons.Default.Person,
+            drawableResId = R.drawable.user,
             onExpandableClick = { profiloExpanded = !profiloExpanded }
         ) {
             DrawerSubMenuItem("Dati personali", onClick = onItemClick)
@@ -56,16 +58,28 @@ fun DrawerMenuContent(
         DrawerMenuSection(
             expanded = supportoExpanded,
             label = "Supporto",
-            icon = Icons.Default.Info,
+            drawableResId = R.drawable.help, // <-- Il tuo file PNG (help.png) in drawable
             onExpandableClick = { supportoExpanded = !supportoExpanded }
         ) {
             DrawerSubMenuItem("Diario", onClick = onItemClick)
             DrawerSubMenuItem("Motivazione", onClick = onItemClick)
             DrawerSubMenuItem("Aiuto", onClick = onItemClick)
         }
-        DrawerMenuItem("Challenge", Icons.Default.Star, onItemClick)
-        DrawerMenuItem("Ricette consigliate", Icons.Default.DateRange, onItemClick)
-        DrawerMenuItem("Impostazioni", Icons.Default.Settings, onItemClick)
+        DrawerMenuItemWithCustomDrawable(
+            label = "Challenge",
+            drawableResId = R.drawable.challenge,
+            onClick = onItemClick
+        )
+        DrawerMenuItemWithCustomDrawable(
+            label = "Ricette consigliate",
+            drawableResId = R.drawable.ricette,
+            onClick = onItemClick
+        )
+        DrawerMenuItemWithCustomDrawable(
+            label = "Impostazioni",
+            drawableResId = R.drawable.setting,
+            onClick = onItemClick
+        )
         Spacer(Modifier.weight(1f))
     }
 }
@@ -74,7 +88,8 @@ fun DrawerMenuContent(
 fun DrawerMenuSection(
     expanded: Boolean,
     label: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector? = null,
+    drawableResId: Int? = null,
     onExpandableClick: () -> Unit,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -85,7 +100,18 @@ fun DrawerMenuSection(
             .padding(vertical = 8.dp, horizontal = 18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, contentDescription = label)
+        when {
+            drawableResId != null -> {
+                Image(
+                    painter = painterResource(id = drawableResId),
+                    contentDescription = label,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            icon != null -> {
+                Icon(icon, contentDescription = label)
+            }
+        }
         Spacer(Modifier.width(10.dp))
         Text(label, fontSize = 16.sp)
         Spacer(Modifier.weight(1f))
@@ -119,7 +145,7 @@ fun DrawerSubMenuItem(
 @Composable
 fun DrawerMenuItem(
     label: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     onClick: (String) -> Unit
 ) {
     Row(
@@ -130,6 +156,29 @@ fun DrawerMenuItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(icon, contentDescription = label)
+        Spacer(Modifier.width(10.dp))
+        Text(label, fontSize = 16.sp)
+    }
+}
+
+@Composable
+fun DrawerMenuItemWithCustomDrawable(
+    label: String,
+    drawableResId: Int,
+    onClick: (String) -> Unit
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clickable { onClick(label) }
+            .padding(vertical = 12.dp, horizontal = 18.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = drawableResId),
+            contentDescription = label,
+            modifier = Modifier.size(24.dp)
+        )
         Spacer(Modifier.width(10.dp))
         Text(label, fontSize = 16.sp)
     }
