@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.yumeat_25.data.Food
 
+private const val MAX_FOODS_PER_MEAL = 3
+
 @Composable
 fun SafeModeDashboard(
     mealsList: List<Pair<String, List<Food>>>,
@@ -33,17 +35,18 @@ fun SafeModeDashboard(
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 30.dp, horizontal = 18.dp),
+                .padding(vertical = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Ciao, oggi conta come ti senti non cosa mangi!",
+                text = "Ciao, oggi conta come ti senti, \nnon cosa mangi!",
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
                 color = Color.Black,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 19.dp),
             )
-            Spacer(Modifier.height(13.dp))
+            Spacer(Modifier.height(15.dp))
             Text(
                 text = "Stai seguendo un buon ritmo,\ncontinua ad ascoltare il tuo corpo! 😁",
                 fontWeight = FontWeight.Bold,
@@ -51,11 +54,10 @@ fun SafeModeDashboard(
                 color = Color.Black,
                 textAlign = TextAlign.Center
             )
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(60.dp))
             Row(
                 Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 MacroQualitative("Carboidrati", "Adeguato", Color(0xFF59AE4A), Modifier.weight(1f))
@@ -70,7 +72,8 @@ fun SafeModeDashboard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .heightIn(max = 360.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -85,7 +88,7 @@ fun SafeModeDashboard(
                 fontWeight = FontWeight.Medium,
                 fontSize = 16.sp,
                 color = Color.Black,
-                modifier = Modifier.padding(start = 8.dp, bottom = 6.dp)
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             mealsList.forEach { (mealName, foods) ->
                 Column(Modifier.padding(vertical = 6.dp, horizontal = 8.dp)) {
@@ -103,13 +106,14 @@ fun SafeModeDashboard(
                             modifier = Modifier.padding(start = 16.dp, top = 2.dp)
                         )
                     } else {
-                        foods.forEach { food ->
-                            Text(
-                                text = food.name,
-                                fontSize = 15.sp,
-                                modifier = Modifier.padding(start = 16.dp, top = 2.dp, bottom = 2.dp)
-                            )
-                        }
+                        val shownFoods = foods.take(MAX_FOODS_PER_MEAL)
+                        val foodNames = shownFoods.joinToString(", ") { it.name }
+                        Text(
+                            text = foodNames + if (foods.size > MAX_FOODS_PER_MEAL) ", ..." else "",
+                            fontSize = 15.sp,
+                            modifier = Modifier.padding(start = 16.dp, top = 2.dp, bottom = 2.dp)
+                        )
+                        // In safe mode, NON mostrare calorie/macronutrienti!
                     }
                 }
             }
