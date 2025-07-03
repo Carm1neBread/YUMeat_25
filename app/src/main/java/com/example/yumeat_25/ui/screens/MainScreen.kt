@@ -29,6 +29,8 @@ import java.time.format.TextStyle
 import java.util.*
 import com.example.yumeat_25.R
 
+private const val MAX_FOODS_PER_MEAL = 3 // Cambia qui per modificare il massimo per card
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
@@ -164,7 +166,7 @@ fun MainScreen(
                 onClick = { navController.navigate("add_meal?safeMode=$isSafeMode") },
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(start = 20.dp, bottom = 35.dp),
+                    .padding(start = 20.dp, bottom = 50.dp),
                 containerColor = Color.White
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Aggiungi pasto", tint = Color.Black)
@@ -174,7 +176,7 @@ fun MainScreen(
                 onClick = { navController.navigate("ai_chat") },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 20.dp, bottom = 35.dp),
+                    .padding(end = 20.dp, bottom = 50.dp),
                 containerColor = Color.White
             ) {
                 Image(
@@ -211,7 +213,7 @@ fun NormalDashboard(
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 20.dp),
+                .padding(vertical = 20.dp, horizontal = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -274,7 +276,8 @@ fun NormalDashboard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .heightIn(max = 360.dp), // Limita l'altezza massima della card pasti
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -289,7 +292,7 @@ fun NormalDashboard(
                 fontWeight = FontWeight.Medium,
                 fontSize = 16.sp,
                 color = Color.Black,
-                modifier = Modifier.padding(start = 8.dp, bottom = 6.dp)
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             mealsList.forEach { (mealName, foods) ->
                 Column(Modifier.padding(vertical = 6.dp, horizontal = 8.dp)) {
@@ -307,17 +310,18 @@ fun NormalDashboard(
                             modifier = Modifier.padding(start = 16.dp, top = 2.dp)
                         )
                     } else {
+                        val shownFoods = foods.take(MAX_FOODS_PER_MEAL)
+                        val foodNames = shownFoods.joinToString(", ") { it.name }
+                        Text(
+                            text = foodNames + if (foods.size > MAX_FOODS_PER_MEAL) ", ..." else "",
+                            fontSize = 15.sp,
+                            modifier = Modifier.padding(start = 16.dp, top = 2.dp, bottom = 2.dp)
+                        )
+                        // Calcola i macro sull'INTERA lista di alimenti del pasto!
                         val totalCalories = foods.sumOf { it.calories }
                         val totalCarbs = foods.sumOf { it.carbs }
                         val totalProtein = foods.sumOf { it.protein }
                         val totalFat = foods.sumOf { it.fat }
-                        foods.forEach { food ->
-                            Text(
-                                text = food.name,
-                                fontSize = 15.sp,
-                                modifier = Modifier.padding(start = 16.dp, top = 2.dp, bottom = 2.dp)
-                            )
-                        }
                         Text(
                             text = "$totalCalories kcal | C:${totalCarbs}g P:${totalProtein}g F:${totalFat}g",
                             color = Color.Gray,
