@@ -7,9 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.example.yumeat_25.data.UserProfileRepository
-import com.example.yumeat_25.data.MealRepository
-import com.example.yumeat_25.data.FoodRepository
+import com.example.yumeat_25.data.*
 import com.example.yumeat_25.ui.screens.*
 import com.example.yumeat_25.ui.screens.onboarding.*
 
@@ -246,6 +244,13 @@ fun YUMeatNavigation(
         composable("settings") {
             SettingsScreen(
                 navController = navController
+            )
+        }
+
+        composable("ai_chat") {
+            AIChatScreen(
+                navController = navController,
+                chatRepository = remember { ChatRepository() }
             )
         }
     }
