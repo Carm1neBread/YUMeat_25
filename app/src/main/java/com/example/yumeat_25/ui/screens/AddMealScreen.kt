@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,7 +57,7 @@ fun AddMealScreen(
         ) {
             // Selezione pasto: colazione, pranzo, cena
             Text(
-                text = "A quale pasto vuoi aggiungere? *",
+                text = "A quale pasto vuoi aggiungere? (valori per 100g)",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -111,8 +112,7 @@ fun AddMealScreen(
         AddFoodDetailDialog(
             defaultFood = showAddFoodDialog!!,
             onDismiss = { showAddFoodDialog = null },
-            onConfirm = { food, notes ->
-                // For now, notes are ignored, but you can extend Food to include notes if desired.
+            onConfirm = { food ->
                 userProfileRepository.addFoodToMeal(food, selectedMealTime)
                 onMealAdded()
             }
@@ -127,6 +127,7 @@ fun FoodItem(
     onDetailAdd: () -> Unit,
     canQuickAdd: Boolean
 ) {
+    val customColor = Color(0xFF1F5F5B)
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -162,69 +163,19 @@ fun FoodItem(
                     Icon(
                         Icons.Default.Add,
                         contentDescription = "Aggiungi rapidamente",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = Color(0xFF0694F4)
                     )
                 }
             }
 
-            TextButton(onClick = onDetailAdd) {
+            TextButton(
+                onClick = onDetailAdd,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = customColor
+                )
+            ) {
                 Text("Dettagli")
             }
         }
     }
-}
-
-@Composable
-fun AddFoodDetailDialog(
-    defaultFood: Food,
-    onDismiss: () -> Unit,
-    onConfirm: (Food, String) -> Unit
-) {
-    var foodName by remember { mutableStateOf(defaultFood.name) }
-    var notes by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Aggiungi alimento") },
-        text = {
-            Column {
-                OutlinedTextField(
-                    value = foodName,
-                    onValueChange = { foodName = it },
-                    label = { Text("Nome alimento") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp)
-                )
-                OutlinedTextField(
-                    value = notes,
-                    onValueChange = { notes = it },
-                    label = { Text("Note (opzionale)") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                // Mostra i valori nutrizionali (solo visualizzazione)
-                Text(
-                    text = "${defaultFood.calories} kcal • C: ${defaultFood.carbs}g P: ${defaultFood.protein}g F: ${defaultFood.fat}g",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirm(defaultFood.copy(name = foodName), notes)
-                },
-                enabled = foodName.isNotBlank()
-            ) {
-                Text("Aggiungi")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Annulla")
-            }
-        }
-    )
 }

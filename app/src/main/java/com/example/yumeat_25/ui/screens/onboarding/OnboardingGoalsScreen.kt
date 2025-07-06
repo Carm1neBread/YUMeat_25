@@ -19,7 +19,7 @@ import com.example.yumeat_25.data.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnboardingGoalsScreen(
-    onNext: (UserGoals) -> Unit,
+    onNext: (UserGoals, safeMode: Boolean) -> Unit,
     onBack: () -> Unit
 ) {
     var selectedGoal by remember { mutableStateOf<String?>(null) }
@@ -180,7 +180,8 @@ fun OnboardingGoalsScreen(
                         UserGoals(
                             primaryGoal = selectedGoal!!,
                             safeMode = safeMode
-                        )
+                        ),
+                        safeMode // Passa anche il valore del safeMode qui!
                     )
                 }
             },

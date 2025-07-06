@@ -17,18 +17,23 @@ import com.example.yumeat_25.ui.screens.onboarding.*
 fun YUMeatNavigation(
     navController: NavHostController = rememberNavController()
 ) {
-    // Singletons for repositories (use remember so they're not recreated)
     val userProfileRepository = remember { UserProfileRepository() }
     val mealRepository = remember { MealRepository() }
     val foodRepository = remember { FoodRepository() }
     val userProfile by userProfileRepository.userProfile.collectAsState()
 
-    // Used to pass Meal name between screens (safer than the entire object)
     var selectedMealName by remember { mutableStateOf<String?>(null) }
 
     NavHost(
         navController = navController,
-        startDestination = if (!userProfile.isOnboardingComplete) "onboarding_welcome" else "main"
+        startDestination =
+            if (!userProfile.isOnboardingComplete) {
+                "onboarding_welcome"
+            } else if (userProfile.goals.safeMode) {
+                "main?safeMode=true"
+            } else {
+                "main"
+            }
     ) {
         // Onboarding Flow
         composable("onboarding_welcome") {
@@ -58,19 +63,49 @@ fun YUMeatNavigation(
         }
 
         composable("onboarding_goals") {
+            var requestedSafeMode by remember { mutableStateOf<Boolean?>(null) }
+            val onboardingProfile by userProfileRepository.userProfile.collectAsState()
+
+            LaunchedEffect(onboardingProfile.goals.safeMode, requestedSafeMode) {
+                if (requestedSafeMode != null && onboardingProfile.isOnboardingComplete) {
+                    if (onboardingProfile.goals.safeMode) {
+                        navController.navigate("main?safeMode=true") {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate("main") {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                    requestedSafeMode = null
+                }
+            }
+
             OnboardingGoalsScreen(
-                onNext = { goals ->
+                onNext = { goals, safeMode ->
                     userProfileRepository.updateGoals(goals)
                     userProfileRepository.completeOnboarding()
-                    navController.navigate("main") {
-                        popUpTo(0) { inclusive = true }
-                    }
+                    requestedSafeMode = safeMode
                 },
                 onBack = { navController.popBackStack() }
             )
         }
 
         // Main App
+        composable(
+            route = "main?safeMode={safeMode}",
+            arguments = listOf(navArgument("safeMode") {
+                type = NavType.StringType
+                defaultValue = "false"
+            })
+        ) { backStackEntry ->
+            val safeMode = backStackEntry.arguments?.getString("safeMode") == "true"
+            MainScreen(
+                navController = navController,
+                userProfileRepository = userProfileRepository,
+                initialSafeMode = safeMode
+            )
+        }
         composable("main") {
             MainScreen(
                 navController = navController,
@@ -149,7 +184,6 @@ fun YUMeatNavigation(
             )
         }
 
-        // Dettaglio ricetta estende la logica safeMode per RecipeDetailScreen se vuoi!
         composable(
             route = "recipe_detail?safeMode={safeMode}",
             arguments = listOf(navArgument("safeMode") {
@@ -167,10 +201,6 @@ fun YUMeatNavigation(
                     safeMode = safeMode
                 )
             }
-        }
-
-        composable("education") {
-            EducationScreen(onBack = { navController.popBackStack() })
         }
 
         // Meal details route - SafeMode aware

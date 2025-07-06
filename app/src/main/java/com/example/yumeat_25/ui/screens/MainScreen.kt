@@ -35,12 +35,13 @@ private const val MAX_FOODS_PER_MEAL = 3 // Cambia qui per modificare il massimo
 @Composable
 fun MainScreen(
     navController: NavController,
-    userProfileRepository: UserProfileRepository
+    userProfileRepository: UserProfileRepository,
+    initialSafeMode: Boolean = false // AGGIUNTO parametro per safe mode iniziale
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var drawerOpenCount by remember { mutableStateOf(0) }
-    var isSafeMode by rememberSaveable { mutableStateOf(false) }
+    var isSafeMode by rememberSaveable { mutableStateOf(initialSafeMode) } // Modificato qui
 
     ModalNavigationDrawer(
         drawerState = drawerState,
