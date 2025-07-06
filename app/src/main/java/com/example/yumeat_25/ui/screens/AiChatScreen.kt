@@ -1,5 +1,8 @@
 package com.example.yumeat_25.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -33,11 +37,23 @@ fun AIChatScreen(
     chatRepository: ChatRepository
 ) {
     val messages by chatRepository.messages.collectAsState()
+    val isLoading by chatRepository.isLoading.collectAsState()
+    val error by chatRepository.error.collectAsState()
+
     var userInput by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Mostra Snackbar quando c'è un errore
+    LaunchedEffect(error) {
+        error?.let {
+            snackbarHostState.showSnackbar(
+                message = it,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -52,7 +68,10 @@ fun AIChatScreen(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        enabled = !isLoading
+                    ) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Indietro")
                     }
                 }
@@ -60,100 +79,114 @@ fun AIChatScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Messages list
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                state = listState,
-                reverseLayout = false
+            Column(
+                modifier = Modifier.fillMaxSize()
             ) {
-                if (messages.isEmpty()) {
-                    item {
-                        AIWelcomeMessage()
-                    }
-                }
-
-                items(messages) { message ->
-                    ChatMessage(message = message)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-
-                if (isLoading) {
-                    item {
-                        LoadingIndicator()
-                    }
-                }
-            }
-
-            // Scroll to bottom when new message is added
-            LaunchedEffect(messages.size) {
-                if (messages.isNotEmpty()) {
-                    listState.animateScrollToItem(messages.size - 1)
-                }
-            }
-
-            // Input field
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3))
-            ) {
-                Row(
+                // Messages list
+                LazyColumn(
                     modifier = Modifier
-                        .padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    state = listState,
+                    reverseLayout = false
                 ) {
-                    TextField(
-                        value = userInput,
-                        onValueChange = { userInput = it },
-                        modifier = Modifier.weight(1f),
-                        placeholder = { Text("Fammi una domanda...") },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            disabledContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                        ),
-                        singleLine = true,
-                        enabled = !isLoading
-                    )
+                    if (messages.isEmpty()) {
+                        item {
+                            AIWelcomeMessage()
+                        }
+                    }
 
-                    IconButton(
-                        onClick = {
-                            if (userInput.isNotBlank() && !isLoading) {
-                                scope.launch {
-                                    isLoading = true
-                                    val result = chatRepository.sendMessage(userInput)
-                                    isLoading = false
-                                    userInput = ""
+                    items(messages) { message ->
+                        ChatMessage(message = message)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
 
-                                    result.onFailure { exception ->
-                                        snackbarHostState.showSnackbar(
-                                            message = "Errore: ${exception.localizedMessage}",
-                                            duration = SnackbarDuration.Short
-                                        )
+                    if (isLoading) {
+                        item {
+                            LoadingIndicator()
+                        }
+                    }
+                }
+
+                // Scroll to bottom when new message is added
+                LaunchedEffect(messages.size) {
+                    if (messages.isNotEmpty()) {
+                        listState.animateScrollToItem(messages.size - 1)
+                    }
+                }
+
+                // Input area
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextField(
+                            value = userInput,
+                            onValueChange = { userInput = it },
+                            modifier = Modifier.weight(1f),
+                            placeholder = { Text("Fammi una domanda...") },
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                disabledContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                            ),
+                            singleLine = true,
+                            enabled = !isLoading
+                        )
+
+                        IconButton(
+                            onClick = {
+                                if (userInput.isNotBlank()) {
+                                    scope.launch {
+                                        chatRepository.sendMessage(userInput)
+                                        userInput = ""
                                     }
                                 }
-                            }
-                        },
-                        enabled = userInput.isNotBlank() && !isLoading
+                            },
+                            enabled = userInput.isNotBlank() && !isLoading
+                        ) {
+                            Icon(
+                                Icons.Default.Send,
+                                contentDescription = "Invia",
+                                tint = if (userInput.isNotBlank() && !isLoading)
+                                    Color(0xFF1F5F5B) else Color.Gray
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Overlay loading indicator for long operations
+            AnimatedVisibility(
+                visible = isLoading,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier.matchParentSize()
+            ) {
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.3f)),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            Icons.Default.Send,
-                            contentDescription = "Invia",
-                            tint = if (userInput.isNotBlank() && !isLoading)
-                                Color(0xFF1F5F5B) else Color.Gray
-                        )
+                        CircularProgressIndicator(color = Color.White)
                     }
                 }
             }
@@ -167,7 +200,7 @@ fun LoadingIndicator() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        contentAlignment = Alignment.CenterStart
+        contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
             modifier = Modifier.size(24.dp),
@@ -213,7 +246,9 @@ fun ChatMessage(message: Message) {
     val alignment = if (message.isFromUser) Alignment.End else Alignment.Start
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         horizontalAlignment = alignment
     ) {
         Card(
@@ -224,7 +259,8 @@ fun ChatMessage(message: Message) {
                 text = message.content,
                 color = textColor,
                 modifier = Modifier.padding(12.dp),
-                fontSize = 15.sp
+                fontSize = 15.sp,
+                textAlign = if (message.isFromUser) TextAlign.End else TextAlign.Start
             )
         }
     }
