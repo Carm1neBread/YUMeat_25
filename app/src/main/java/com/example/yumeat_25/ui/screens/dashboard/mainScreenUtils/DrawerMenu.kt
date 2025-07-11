@@ -37,9 +37,8 @@ fun DrawerMenuContent(
                 .padding(horizontal = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Replace with your logo as needed (use painterResource if you have an image asset)
             Icon(
-                painterResource(id = R.drawable.logo), // Replace with your app logo
+                painterResource(id = R.drawable.logo),
                 contentDescription = "Logo",
                 tint = Color(0xFF64916D),
                 modifier = Modifier.size(100.dp)
@@ -58,7 +57,7 @@ fun DrawerMenuContent(
         DrawerMenuSection(
             expanded = supportoExpanded,
             label = "Supporto",
-            drawableResId = R.drawable.help, // <-- Il tuo file PNG (help.png) in drawable
+            drawableResId = R.drawable.help,
             onExpandableClick = { supportoExpanded = !supportoExpanded }
         ) {
             DrawerSubMenuItem("Diario", onClick = onItemClick)

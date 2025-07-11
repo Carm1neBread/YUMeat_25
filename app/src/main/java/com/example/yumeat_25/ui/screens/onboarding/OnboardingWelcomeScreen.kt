@@ -19,13 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextAlign.Companion.Center
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,9 +30,10 @@ import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.example.yumeat_25.R
+import com.example.yumeat_25.data.*
 
 data class CarouselItem(
-    val imageRes: Int, // Image resource id
+    val imageRes: Int,
     val title: String,
     val description: String
 )
@@ -43,17 +41,18 @@ data class CarouselItem(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OnboardingWelcomeScreen(
-    onNext: () -> Unit
+    onNext: () -> Unit,
+    userProfileRepository: UserProfileRepository
 ) {
     var showLoginDialog by remember { mutableStateOf(false) }
     var showRegisterDialog by remember { mutableStateOf(false) }
 
-    // Carousel items
+    // Elementi carosello
     val items = listOf(
         CarouselItem(
             imageRes = R.drawable.img1,
             title = "Benvenuto in YUMeat",
-            description = "L’app che ti aiuta a costruire abitudini alimentari sane e sostenibili, \n" +
+            description = "L'app che ti aiuta a costruire abitudini alimentari sane e sostenibili, \n" +
                     "senza stress da calorie o numeri"
         ),
         CarouselItem(
@@ -80,7 +79,7 @@ fun OnboardingWelcomeScreen(
     val pagerState = rememberPagerState(pageCount = { items.size })
     val scope = rememberCoroutineScope()
 
-    // Auto-scroll logic
+    // Auto-scroll
     LaunchedEffect(Unit) {
         while (true) {
             delay(3000)
@@ -99,7 +98,7 @@ fun OnboardingWelcomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // --- TOP BAR: LOGO & APP NAME ---
+            //  TOP BAR: LOGO & NOME APP
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -120,7 +119,7 @@ fun OnboardingWelcomeScreen(
                 )
             }
 
-            // --- CAROUSEL ---
+            // CAROSELLO
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -161,7 +160,7 @@ fun OnboardingWelcomeScreen(
                 }
             }
 
-            // --- PAGE INDICATOR DOTS ---
+            // INDICATORI DI PAGINA
             Row(
                 modifier = Modifier
                     .padding(bottom = 32.dp)
@@ -186,7 +185,7 @@ fun OnboardingWelcomeScreen(
                 }
             }
 
-            // --- BUTTONS ---
+            // BUTTONS
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -221,7 +220,7 @@ fun OnboardingWelcomeScreen(
             }
         }
 
-        // --- LOGIN/REGISTER POPUP OVERLAY ---
+        //  LOGIN/REGISTER POPUP OVERLAY
         AnimatedVisibility(
             visible = showLoginDialog || showRegisterDialog,
             enter = slideInVertically(
@@ -246,7 +245,7 @@ fun OnboardingWelcomeScreen(
                     .zIndex(2f)
                     .clickable(
                         onClick = {
-                            // Dismiss on outside click
+                            // Si chiude se si schiaccia al di fuori della modale
                             if (showLoginDialog) showLoginDialog = false
                             if (showRegisterDialog) showRegisterDialog = false
                         },
@@ -259,14 +258,22 @@ fun OnboardingWelcomeScreen(
                     AuthBottomSheet(
                         isLogin = true,
                         onDismiss = { showLoginDialog = false },
-                        onSubmit = onNext
+                        onSubmit = {
+                            createDefaultProfile(userProfileRepository)
+                            onNext()
+                        },
+                        onSocialLogin = {
+                            createDefaultProfile(userProfileRepository)
+                            onNext()
+                        }
                     )
                 }
                 if (showRegisterDialog) {
                     AuthBottomSheet(
                         isLogin = false,
                         onDismiss = { showRegisterDialog = false },
-                        onSubmit = onNext
+                        onSubmit = { onNext() },
+                        onSocialLogin = { onNext() }
                     )
                 }
             }
@@ -274,18 +281,51 @@ fun OnboardingWelcomeScreen(
     }
 }
 
+// Funzione per creare un profilo utente predefinito quando si accede direttamente alla MainScreen
+private fun createDefaultProfile(userProfileRepository: UserProfileRepository) {
+    // Dati personali casuali ma realistici
+    val personalData = PersonalData(
+        name = "Utente",
+        age = "30",
+        height = "175",
+        weight = "70"
+    )
+
+    // Preferenze alimentari di default
+    val dietaryPreferences = DietaryPreferences(
+        vegetarian = false,
+        vegan = false,
+        glutenFree = false,
+        dairyFree = false,
+        avoidRedMeat = false,
+        avoidSugar = false
+    )
+
+    // Obiettivi predefiniti
+    val userGoals = UserGoals(
+        primaryGoal = "Mantenere il mio peso attuale",
+        safeMode = false
+    )
+
+    // Aggiorna il repository con i dati predefiniti
+    userProfileRepository.updatePersonalData(personalData)
+    userProfileRepository.updateDietaryPreferences(dietaryPreferences)
+    userProfileRepository.updateGoals(userGoals)
+    userProfileRepository.completeOnboarding()
+}
+
 @Composable
 fun AuthBottomSheet(
     isLogin: Boolean,
     onDismiss: () -> Unit,
-    onSubmit: () -> Unit
+    onSubmit: () -> Unit,
+    onSocialLogin: () -> Unit
 ) {
-    // State for the form
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
 
-    // Custom shadow only on the top of the popup
     val topShadow = Modifier
         .fillMaxWidth()
         .height(12.dp)
@@ -300,16 +340,15 @@ fun AuthBottomSheet(
     Box(
         Modifier
             .fillMaxWidth()
-            .heightIn(min = 520.dp) // Make the popup higher
+            .heightIn(min = 520.dp)
             .wrapContentHeight()
             .zIndex(10f)
     ) {
-        // Only shadow at the top
+
         Box(
             modifier = topShadow.align(Alignment.TopCenter)
         )
 
-        // Main card
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -335,7 +374,6 @@ fun AuthBottomSheet(
             )
 
             if (!isLogin) {
-                // Borderless input with centered placeholder and value
                 BasicTextFieldWithBackground(
                     value = name,
                     onValueChange = { name = it },
@@ -381,7 +419,7 @@ fun AuthBottomSheet(
 
             if (isLogin) {
                 TextButton(
-                    onClick = { /* handle forgot password */ },
+                    onClick = { /* gestire password dimenticata */ },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Text(
@@ -401,15 +439,14 @@ fun AuthBottomSheet(
                     .padding(top = 18.dp, bottom = 12.dp)
             ) {
                 Divider(modifier = Modifier.weight(1f))
-                Text(
-                    "  O accedi con  ",
+                Text(if (isLogin) "  O accedi con  " else "  O registrati con  ",
                     color = Color(0xFF888888),
                     fontSize = 14.sp
                 )
                 Divider(modifier = Modifier.weight(1f))
             }
 
-            // Social login buttons (borderless)
+            // Social login buttons
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -417,14 +454,13 @@ fun AuthBottomSheet(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(
-                    onClick = { /* handle Google login */ },
+                    onClick = { onSocialLogin() },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White,
                         contentColor = Color.Black
                     ),
-                    elevation = null,
-                    border = null,
+                    elevation = ButtonDefaults.buttonElevation(0.dp),
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
@@ -433,19 +469,20 @@ fun AuthBottomSheet(
                     Image(
                         painter = painterResource(R.drawable.google),
                         contentDescription = null,
-                        modifier = Modifier.requiredSize(40.dp)
+                        modifier = Modifier.size(20.dp)
                     )
+                    Spacer(Modifier.width(8.dp))
                     Text("Google", color = Color.Black)
                 }
+
                 Button(
-                    onClick = { /* handle Facebook login */ },
+                    onClick = { onSocialLogin() },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White,
                         contentColor = Color(0xFF1877F3)
                     ),
-                    elevation = null,
-                    border = null,
+                    elevation = ButtonDefaults.buttonElevation(0.dp),
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
@@ -454,8 +491,9 @@ fun AuthBottomSheet(
                     Image(
                         painter = painterResource(R.drawable.facebook),
                         contentDescription = null,
-                        modifier = Modifier.requiredSize(40.dp)
+                        modifier = Modifier.size(20.dp)
                     )
+                    Spacer(Modifier.width(8.dp))
                     Text("Facebook", color = Color(0xFF1877F3))
                 }
             }
@@ -490,7 +528,7 @@ fun BasicTextFieldWithBackground(
             textStyle = LocalTextStyle.current.copy(
                 color = Color.Black,
                 fontSize = 16.sp,
-                textAlign = TextAlign.Start // Center text in the field
+                textAlign = TextAlign.Start
             ),
             visualTransformation = visualTransformation,
             decorationBox = { innerTextField ->

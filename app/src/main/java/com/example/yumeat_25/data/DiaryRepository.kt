@@ -13,7 +13,7 @@ class DiaryRepository {
     val currentEntry: StateFlow<DiaryEntry?> = _currentEntry.asStateFlow()
 
     init {
-        // Inizializza con qualche voce di esempio
+        // Inizializzazione di pagine di diario di default
         _entries.value = listOf(
             DiaryEntry(
                 id = "1",
@@ -32,19 +32,17 @@ class DiaryRepository {
             )
         )
 
-        // Inizializza l'entry corrente con la data di oggi
+        // Inizializzazione della data della pagina
         _currentEntry.value = DiaryEntry(date = LocalDate.now())
     }
 
     fun updateCurrentEntry(entry: DiaryEntry) {
         _currentEntry.value = entry
     }
-
+    //Metodo per salvataggio della pagina appena scritta
     fun saveCurrentEntry() {
         _currentEntry.value?.let { entry ->
-            // Aggiungi la nuova voce in cima alla lista (la più recente prima)
             _entries.value = listOf(entry) + _entries.value
-            // Reset dell'entry corrente
             _currentEntry.value = DiaryEntry(date = LocalDate.now())
         }
     }

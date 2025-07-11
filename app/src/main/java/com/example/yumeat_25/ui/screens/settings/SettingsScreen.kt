@@ -32,7 +32,7 @@ fun SettingsScreen(
     var showSnackbar by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Snackbar effect: shows when showSnackbar becomes true, then auto-hide and switch back to light mode
+    // logica snackbar, appare la notifica e torna a light quando cerchiamo di impostare dark mode
     LaunchedEffect(showSnackbar) {
         if (showSnackbar) {
             snackbarHostState.showSnackbar(
@@ -56,7 +56,6 @@ fun SettingsScreen(
                 .padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(50.dp))
-            // Top bar with back and title centered
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -80,20 +79,19 @@ fun SettingsScreen(
             }
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Row for dark mode icon and theme switch
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(start = 6.dp)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.moon), // usa il nome del tuo file senza estensione
+                    painter = painterResource(id = R.drawable.moon),
                     contentDescription = "Dark mode",
                     modifier = Modifier.size(36.dp)
                 )
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // Theme Toggle
+                // selezione tema chiaro/scuro
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -144,8 +142,6 @@ fun SettingsScreen(
                 )
             }
         }
-
-        // Snackbar Host: verde come le altre notifiche
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier
@@ -154,7 +150,7 @@ fun SettingsScreen(
         ) { snackbarData ->
             Snackbar(
                 snackbarData = snackbarData,
-                containerColor = Color(0xFF295B4F), // Verde custom
+                containerColor = Color(0xFF295B4F),
                 contentColor = Color.White
             )
         }

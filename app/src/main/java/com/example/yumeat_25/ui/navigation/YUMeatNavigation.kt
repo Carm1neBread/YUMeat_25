@@ -36,7 +36,7 @@ fun YUMeatNavigation(
     val mealRepository = remember { MealRepository() }
     val foodRepository = remember { FoodRepository() }
     val chatRepository = remember(userProfile) { ChatRepository(userProfile) }
-    val diaryRepository = remember { DiaryRepository() }  // Aggiungiamo il repository del diario
+    val diaryRepository = remember { DiaryRepository() }
 
     var selectedMealName by remember { mutableStateOf<String?>(null) }
 
@@ -51,12 +51,14 @@ fun YUMeatNavigation(
                 "main"
             }
     ) {
-        // Onboarding Flow
+        //Percorso di onboarding
         composable("onboarding_welcome") {
             OnboardingWelcomeScreen(
-                onNext = { navController.navigate("onboarding_personal_data") }
+                onNext = { navController.navigate("onboarding_personal_data") },
+                userProfileRepository = userProfileRepository
             )
         }
+
 
         composable("onboarding_personal_data") {
             OnboardingPersonalDataScreen(
@@ -129,7 +131,7 @@ fun YUMeatNavigation(
             )
         }
 
-        // Add meal route - SafeMode aware
+        // Percorso per aggiunta cibo safe-mode/normale
         composable(
             route = "add_meal?safeMode={safeMode}",
             arguments = listOf(navArgument("safeMode") {
@@ -189,7 +191,7 @@ fun YUMeatNavigation(
             )
         }
 
-        // Ricette - SafeMode aware
+        // Percorso per ricette consigliate safe-mode/normale
         composable(
             route = "recipes?safeMode={safeMode}",
             arguments = listOf(navArgument("safeMode") {
@@ -228,7 +230,7 @@ fun YUMeatNavigation(
             }
         }
 
-        // Meal details route - SafeMode aware
+        // Dettaglio ricette
         composable(
             route = "meal_details?safeMode={safeMode}",
             arguments = listOf(navArgument("safeMode") {

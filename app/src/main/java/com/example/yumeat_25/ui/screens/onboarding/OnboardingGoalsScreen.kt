@@ -40,7 +40,6 @@ fun OnboardingGoalsScreen(
             .fillMaxSize()
             .padding(24.dp)
     ) {
-        // Header row with back
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -52,7 +51,7 @@ fun OnboardingGoalsScreen(
             }
         }
 
-        // Progress bar at top
+        // Progress bar
         LinearProgressIndicator(
             progress = 1.0f,
             color = Color(0xFF1F5F5B),
@@ -61,7 +60,6 @@ fun OnboardingGoalsScreen(
                 .padding(top = 24.dp, bottom = 32.dp)
         )
 
-        // Title
         Text(
             text = "Qual è il tuo obiettivo?",
             fontSize = 22.sp,
@@ -72,7 +70,6 @@ fun OnboardingGoalsScreen(
             lineHeight = 28.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
-        // Subtitle
         Text(
             text = "Scegli un obiettivo che vuoi raggiungere",
             fontSize = 15.sp,
@@ -83,7 +80,6 @@ fun OnboardingGoalsScreen(
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
 
-        // Options in a rounded grey wrapper -- now as Card with elevation
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
@@ -148,11 +144,11 @@ fun OnboardingGoalsScreen(
                         checked = safeMode,
                         onCheckedChange = { safeMode = it },
                         colors = CheckboxDefaults.colors(
-                            checkedColor = Color(0xFF1F5F5B),          // Color when checked
-                            uncheckedColor = Color(0xFFB0B0B0),        // Color when NOT checked
-                            checkmarkColor = Color.White,              // Color of the checkmark
-                            disabledCheckedColor = Color.Gray,         // Optional
-                            disabledUncheckedColor = Color.LightGray   // Optional
+                            checkedColor = Color(0xFF1F5F5B),
+                            uncheckedColor = Color(0xFFB0B0B0),
+                            checkmarkColor = Color.White,
+                            disabledCheckedColor = Color.Gray,
+                            disabledUncheckedColor = Color.LightGray
                         )
                     )
                     Text(
@@ -181,7 +177,7 @@ fun OnboardingGoalsScreen(
                             primaryGoal = selectedGoal!!,
                             safeMode = safeMode
                         ),
-                        safeMode // Passa anche il valore del safeMode qui!
+                        safeMode // Passo il valore del safeMode
                     )
                 }
             },

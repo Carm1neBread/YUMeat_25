@@ -27,11 +27,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 fun ChallengeScreen(
     navController: NavController
 ) {
-    // Challenge categories
+    // Categorie challenge
     val categories = listOf("Giornaliere", "Settimanali", "Mensili")
     var selectedCategory by remember { mutableStateOf(0) }
 
-    // Example challenge data for "Giornaliere"
+    // Inizializzazione challenge giornaliere di default
     val dailyChallenges = listOf(
         ChallengeUi(
             title = "Equilibrio del giorno",
@@ -55,14 +55,11 @@ fun ChallengeScreen(
         ),
     )
 
-    // You can create similar lists for weekly and monthly challenges if needed.
     val challengeLists = listOf(
         dailyChallenges,
-        emptyList<ChallengeUi>(), // Replace with your weekly challenges
-        emptyList<ChallengeUi>(), // Replace with your monthly challenges
     )
 
-    // Track which challenge is currently expanded (by index)
+    // Flag per capire quali delle challenge è in primo piano
     var expandedIndex by remember { mutableStateOf<Int?>(null) }
 
 
@@ -73,7 +70,6 @@ fun ChallengeScreen(
             .padding(horizontal = 16.dp)
     ) {
         Spacer(modifier = Modifier.height(50.dp))
-        // Top bar with back, title, and star
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -93,7 +89,6 @@ fun ChallengeScreen(
             Spacer(modifier = Modifier.weight(1.5f))
         }
         Spacer(modifier = Modifier.height(8.dp))
-        // Tabs
         Row(
             Modifier
                 .fillMaxWidth()
@@ -115,7 +110,6 @@ fun ChallengeScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Challenges list
         val challenges = challengeLists[selectedCategory]
         Column {
             challenges.forEachIndexed { idx, challenge ->
@@ -171,7 +165,6 @@ fun ChallengeCard(
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(Modifier.width(12.dp))
-                // Progress circle with animated arc fill
                 ChallengeProgressCircle(progressString = challenge.progress)
             }
             AnimatedVisibility(
@@ -194,7 +187,6 @@ fun ChallengeCard(
 
 @Composable
 fun ChallengeProgressCircle(progressString: String) {
-    // Parse the progress string, fallback to 0/1 if parsing fails
     val (current, total) = remember(progressString) {
         val parts = progressString.split('/')
         val current = parts.getOrNull(0)?.toIntOrNull() ?: 0
@@ -208,20 +200,17 @@ fun ChallengeProgressCircle(progressString: String) {
             .size(40.dp)
             .clip(CircleShape)
             .drawBehind {
-                // Background ring
                 drawCircle(
                     color = Color.White,
                     radius = size.minDimension / 2f
                 )
-                // Progress arc
                 drawArc(
-                    color = Color(0xFF000000), // green
+                    color = Color(0xFF000000),
                     startAngle = -90f,
                     sweepAngle = 360f * progress,
                     useCenter = false,
                     style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round)
                 )
-                // Outer border
             },
         contentAlignment = Alignment.Center
     ) {

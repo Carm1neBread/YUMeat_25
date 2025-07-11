@@ -40,10 +40,10 @@ fun RecipeDetailScreen(
     val recipeImage = meal?.imageRes ?: R.drawable.placeholder
     val hasIngredients = meal?.ingredientTitles != null && meal.ingredientRows != null
 
-    // State for showing dialog
+    // Stato per mostrare il dialog
     var showAddDialog by remember { mutableStateOf(false) }
 
-    // --- SAFE MODE logic ---
+    // safe mode
     var showActiveListening by remember { mutableStateOf(safeMode) }
     var showFeelBadDialog by remember { mutableStateOf(false) }
     var showPauseScreen by remember { mutableStateOf(false) }
@@ -51,10 +51,10 @@ fun RecipeDetailScreen(
     val coroutineScope = rememberCoroutineScope()
     var pauseTimerRunning by remember { mutableStateOf(false) }
 
-    // NEW: Track if safe mode popup flow has already been completed (only once per detail session)
+    //controlla che la notifica sia già stata mostrata in modo tale da non andare in loop
     var safeModePopupCompleted by remember { mutableStateOf(false) }
 
-    // Timer logic for the blocking screen
+    // timer
     fun startPauseTimer() {
         pauseSecondsLeft = 30
         pauseTimerRunning = true
@@ -74,9 +74,7 @@ fun RecipeDetailScreen(
     // Blocca aggiunta pasto se una delle modali safe mode è attiva
     val canAdd = !showActiveListening && !showFeelBadDialog && !showPauseScreen
 
-    // Overlay BLOCK SCREEN a livello root, copre TUTTO (anche la topbar)
     Box(modifier = Modifier.fillMaxSize()) {
-        // Blocca TUTTO (anche topbar) se il timer è attivo
         if (showPauseScreen) {
             PauseBlockScreen(
                 secondsLeft = pauseSecondsLeft,
@@ -133,7 +131,6 @@ fun RecipeDetailScreen(
                             modifier = Modifier
                                 .fillMaxSize()
                         ) {
-                            // Card with elevation effect for the recipe
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth(),
@@ -146,14 +143,12 @@ fun RecipeDetailScreen(
                                         .fillMaxWidth()
                                         .padding(20.dp)
                                 ) {
-                                    // Title
                                     Text(
                                         text = meal.name + " " + (meal.emoji ?: ""),
                                         fontSize = 27.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(bottom = 10.dp)
                                     )
-                                    // Image
                                     Image(
                                         painter = painterResource(id = recipeImage),
                                         contentDescription = meal.name,
@@ -200,7 +195,6 @@ fun RecipeDetailScreen(
                                     )
 
                                     if (hasIngredients) {
-                                        // Table-style ingredients
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
                                             horizontalArrangement = Arrangement.SpaceBetween
@@ -266,7 +260,7 @@ fun RecipeDetailScreen(
                             }
                         }
 
-                        // --- SAFE MODE POPUPS ---
+                        // safe mode popup
                         if (showActiveListening) {
                             ActiveListeningDialog(
                                 onFeelGood = {
@@ -294,7 +288,7 @@ fun RecipeDetailScreen(
                                 }
                             )
                         }
-                        // --- Dialog to add meal to meal time ---
+                        // popup aggiungi ricetta a pasto della giornata
                         if (showAddDialog && meal != null) {
                             AddMealToTimeDialog(
                                 onDismiss = { showAddDialog = false },
@@ -312,7 +306,7 @@ fun RecipeDetailScreen(
     }
 }
 
-/* ----------- SAFE MODE POPUP UI COMPOSABLES ----------- */
+/* safe mode popups*/
 
 @Composable
 fun ActiveListeningDialog(
@@ -377,7 +371,7 @@ fun PauseBlockScreen(
     secondsLeft: Int,
     onInterrupt: () -> Unit
 ) {
-    // Blocca TUTTO lo schermo!
+    // Blocca tutto lo schermo
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -392,7 +386,7 @@ fun PauseBlockScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.clock), // Usa la tua icona personalizzata!
+                    painter = painterResource(id = R.drawable.clock),
                     contentDescription = "Orologio",
                     tint = Color.White,
                     modifier = Modifier.size(60.dp)
@@ -431,7 +425,7 @@ fun PauseBlockScreen(
     }
 }
 
-/* ------------------- DIALOG PER AGGIUNTA ------------- */
+/* dialog per aggiunta*/
 
 @Composable
 fun AddMealToTimeDialog(

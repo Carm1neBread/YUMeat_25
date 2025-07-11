@@ -39,7 +39,6 @@ fun WellnessDiaryScreen(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Usiamo una stringa normale
     var textContent by remember { mutableStateOf(currentEntry?.content ?: "") }
     var isFocused by remember { mutableStateOf(false) }
 
@@ -75,10 +74,9 @@ fun WellnessDiaryScreen(
                     }
                 },
                 actions = {
-                    // Icona personalizzata dal drawable
                     IconButton(onClick = { navController.navigate("diary_history") }) {
                         Image(
-                            painter = painterResource(id = R.drawable.diary), // Sostituisci con il nome del tuo file drawable
+                            painter = painterResource(id = R.drawable.diary),
                             contentDescription = "Visualizza storia",
                             modifier = Modifier.size(24.dp)
                         )
@@ -86,7 +84,7 @@ fun WellnessDiaryScreen(
                 }
             )
         },
-        // Sistema Snackbar personalizzato e centrato
+        // Snackbar personalizzato
         snackbarHost = {
             Box(
                 Modifier.fillMaxSize()
@@ -113,16 +111,12 @@ fun WellnessDiaryScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(24.dp))
-
-            // Sezione emoji
             Text(
                 "Clicca sulle faccine che più ti rappresentano oggi!",
                 textAlign = TextAlign.Center,
                 fontSize = 16.sp,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-
-            // Row di emoji con selezione
             EmojiSelectionRow(
                 selectedEmoji = currentEntry?.emoji ?: MoodEmoji.NEUTRAL,
                 onEmojiSelected = {
@@ -131,8 +125,6 @@ fun WellnessDiaryScreen(
             )
 
             Spacer(modifier = Modifier.height(32.dp))
-
-            // Titolo campo di testo
             Text(
                 "Come ti sei sentito rispetto al cibo oggi?",
                 fontSize = 18.sp,
@@ -142,17 +134,15 @@ fun WellnessDiaryScreen(
                     .padding(bottom = 16.dp),
                 textAlign = TextAlign.Start
             )
-
-            // Card di input testo semplificata
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(160.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFF3F3F3) // Stesso colore delle card in DiaryHistoryScreen
+                    containerColor = Color(0xFFF3F3F3)
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Stesso valore di elevation
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -245,7 +235,7 @@ fun EmojiOption(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Selezione (cerchio)
+        //radio button selezione
         Box(
             modifier = Modifier
                 .size(25.dp)

@@ -33,7 +33,6 @@ fun DietaryPreferencesScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // Local editable state for preferences
     var selectedDiet by remember { mutableStateOf(
         when {
             originalPrefs.vegan -> "Vegana"
@@ -46,7 +45,6 @@ fun DietaryPreferencesScreen(
     var avoidGluten by remember { mutableStateOf(originalPrefs.glutenFree) }
     var avoidSugar by remember { mutableStateOf(originalPrefs.avoidSugar) }
 
-    // Reset values if not in edit mode and userProfile changes
     LaunchedEffect(userProfile, editMode) {
         if (!editMode) {
             selectedDiet = when {
@@ -84,7 +82,7 @@ fun DietaryPreferencesScreen(
                         Snackbar(
                             snackbarData = data,
                             containerColor = Color(0xFF295B4F),
-                            contentColor = Color.White // Optional: black text for contrast
+                            contentColor = Color.White
                         )
                     }
                 )
@@ -98,7 +96,6 @@ fun DietaryPreferencesScreen(
                 .padding(24.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            // Title
             Text(
                 text = "Personalizza la tua\nesperienza alimentare!",
                 fontSize = 22.sp,
@@ -108,7 +105,6 @@ fun DietaryPreferencesScreen(
                 lineHeight = 28.sp,
                 textAlign = TextAlign.Center
             )
-            // Subtitle
             Text(
                 text = "Attiva solo ciò che ti fa sentire a tuo agio.\nPuoi cambiare tutto in qualsiasi momento.",
                 fontSize = 15.sp,
@@ -119,7 +115,7 @@ fun DietaryPreferencesScreen(
                 textAlign = TextAlign.Center
             )
 
-            // Tipo di alimentazione -- CARD with elevation
+            // Tipo di alimentazione
             Card(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -175,7 +171,7 @@ fun DietaryPreferencesScreen(
 
             Spacer(modifier = Modifier.height(22.dp))
 
-            // Alimenti da evitare -- CARD with elevation
+            // Alimenti da evitare
             Card(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -232,8 +228,7 @@ fun DietaryPreferencesScreen(
                             avoidRedMeat = avoidRedMeat,
                             dairyFree = avoidDairy,
                             glutenFree = avoidGluten,
-                            avoidSugar = avoidSugar,
-                            allergies = originalPrefs.allergies // handle allergies as needed
+                            avoidSugar = avoidSugar
                         )
                         scope.launch {
                             userProfileRepository.updateDietaryPreferences(newPrefs)

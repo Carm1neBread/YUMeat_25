@@ -124,7 +124,7 @@ fun FoodItemSafeMode(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
                 )
-                // In safe mode NON mostro info nutrizionali, solo il tipo se vuoi
+                // In safe mode NON mostro info nutrizionali ma solo la categoria (vegano, vegetariano, ecc...)
                 Text(
                     text = food.type.displayName,
                     fontSize = 14.sp,
