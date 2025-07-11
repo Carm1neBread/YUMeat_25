@@ -29,19 +29,19 @@ import java.time.format.TextStyle
 import java.util.*
 import com.example.yumeat_25.R
 
-private const val MAX_FOODS_PER_MEAL = 3 // Cambia qui per modificare il massimo per card
+private const val MAX_FOODS_PER_MEAL = 3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     navController: NavController,
     userProfileRepository: UserProfileRepository,
-    initialSafeMode: Boolean = false // AGGIUNTO parametro per safe mode iniziale
+    initialSafeMode: Boolean = false
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var drawerOpenCount by remember { mutableStateOf(0) }
-    var isSafeMode by rememberSaveable { mutableStateOf(initialSafeMode) } // Modificato qui
+    var isSafeMode by rememberSaveable { mutableStateOf(initialSafeMode) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -279,7 +279,7 @@ fun NormalDashboard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .heightIn(max = 360.dp), // Limita l'altezza massima della card pasti
+            .heightIn(max = 360.dp), //limita l'altezza della card
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -319,7 +319,7 @@ fun NormalDashboard(
                             fontSize = 15.sp,
                             modifier = Modifier.padding(start = 16.dp, top = 2.dp, bottom = 2.dp)
                         )
-                        // Calcola i macro sull'INTERA lista di alimenti del pasto!
+                        // Calcola i macro sull'intera lista di alimenti del pasto
                         val totalCalories = foods.sumOf { it.calories }
                         val totalCarbs = foods.sumOf { it.carbs }
                         val totalProtein = foods.sumOf { it.protein }

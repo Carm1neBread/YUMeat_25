@@ -81,7 +81,6 @@ fun DiaryHistoryScreen(
                     DiaryEntryCard(entry)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
-                // Aggiunge spazio alla fine della lista
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                 }
@@ -99,7 +98,7 @@ fun DiaryEntryCard(entry: DiaryEntry) {
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFF3F3F3)
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)  // Aggiunta elevazione richiesta
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier

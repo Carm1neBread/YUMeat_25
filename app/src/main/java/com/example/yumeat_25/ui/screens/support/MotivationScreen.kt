@@ -24,6 +24,7 @@ import kotlinx.coroutines.delay
 fun MotivationScreen(
     navController: NavController
 ) {
+    //frasi di default
     val quotes = listOf(
         MotivationQuote(
             "Autostima",
@@ -54,7 +55,6 @@ fun MotivationScreen(
         }
     }
 
-    // Custom TopBar as a Card with padding from top
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -144,7 +144,6 @@ fun MotivationQuoteCard(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        // Rotated label on the left, with gap above card
         Text(
             text = label,
             fontSize = 18.sp,
@@ -155,7 +154,6 @@ fun MotivationQuoteCard(
                 .padding(start = 5.dp, top = 8.dp)
         )
 
-        // Quote card with gradient and rounded corners
         Box(
             modifier = Modifier
                 .fillMaxWidth()

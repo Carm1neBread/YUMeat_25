@@ -23,7 +23,7 @@ fun SemiCircularProgressBar(
         Canvas(modifier = Modifier.matchParentSize()) {
             val diameter = size.minDimension
             val arcRect = Size(diameter, diameter)
-            // Draw background arc
+            // Arco vuoto
             drawArc(
                 color = backgroundColor,
                 startAngle = 180f,
@@ -33,7 +33,7 @@ fun SemiCircularProgressBar(
                 size = arcRect,
                 style = Stroke(strokeWidth, cap = StrokeCap.Round)
             )
-            // Draw progress arc
+            // Arco progresso
             drawArc(
                 color = progressColor,
                 startAngle = 180f,
@@ -43,7 +43,6 @@ fun SemiCircularProgressBar(
                 size = arcRect,
                 style = Stroke(strokeWidth, cap = StrokeCap.Round)
             )
-            // Draw end-dot if desired and progress > 0
             if (drawEndDot && progress > 0f) {
                 val angleRad = Math.toRadians(180.0 + 180.0 * progress)
                 val radius = diameter / 2

@@ -27,12 +27,12 @@ fun RecipesScreen(
     navController: NavController,
     mealRepository: MealRepository,
     onRecipeClick: (Meal) -> Unit = { },
-    safeMode: Boolean = false // <--- AGGIUNTO parametro
+    safeMode: Boolean = false
 ) {
     val meals by mealRepository.meals.collectAsState()
     var selectedTab by remember { mutableStateOf(FoodType.ONNIVORE) }
 
-    // Emoji for tabs
+
     val emojiOnnivore = "\uD83E\uDD69"
     val emojiVegetarian = "\uD83C\uDF31"
     val emojiVegan = "\uD83C\uDF31"
@@ -65,7 +65,6 @@ fun RecipesScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Tabs by FoodType with emoji
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -92,8 +91,6 @@ fun RecipesScreen(
                 }
             }
             Divider(modifier = Modifier.padding(bottom = 8.dp))
-
-            // Recipes list
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()

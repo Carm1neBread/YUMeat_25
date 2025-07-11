@@ -33,13 +33,13 @@ fun PersonalDataScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // Editable fields state
+    // Campi editabili
     var name by remember { mutableStateOf(userProfile.personalData.name) }
     var age by remember { mutableStateOf(userProfile.personalData.age) }
     var height by remember { mutableStateOf(userProfile.personalData.height) }
     var weight by remember { mutableStateOf(userProfile.personalData.weight) }
 
-    // Sync fields when editMode is off or userProfile changes
+    // Sincronizza quando non stiamo editando
     LaunchedEffect(userProfile, editMode) {
         if (!editMode) {
             name = userProfile.personalData.name
@@ -72,7 +72,7 @@ fun PersonalDataScreen(
                         Snackbar(
                             snackbarData = data,
                             containerColor = Color(0xFF295B4F),
-                            contentColor = Color.White // Optional: black text for contrast
+                            contentColor = Color.White
                         )
                     }
                 )
@@ -102,7 +102,7 @@ fun PersonalDataScreen(
                     contentDescription = "User",
                     modifier = Modifier
                         .size(150.dp)
-                        .clip(CircleShape) // This makes the image a perfect circle
+                        .clip(CircleShape)
                 )
 
                 Spacer(Modifier.height(8.dp))
@@ -157,7 +157,7 @@ fun PersonalDataScreen(
                 Button(
                     onClick = {
                         if (editMode) {
-                            // Save changes with PersonalData object
+                            // Salvataggio delle informazioni con oggetto PersonalData
                             scope.launch {
                                 userProfileRepository.updatePersonalData(
                                     PersonalData(

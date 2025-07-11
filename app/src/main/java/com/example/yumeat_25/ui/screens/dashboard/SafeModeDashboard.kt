@@ -112,7 +112,6 @@ fun SafeModeDashboard(
                             fontSize = 15.sp,
                             modifier = Modifier.padding(start = 16.dp, top = 2.dp, bottom = 2.dp)
                         )
-                        // In safe mode, NON mostrare calorie/macronutrienti!
                     }
                 }
             }

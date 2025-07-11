@@ -24,6 +24,7 @@ class UserProfileRepository {
         _userProfile.value = _userProfile.value.copy(isOnboardingComplete = true)
     }
 
+    //Metodo per aggiungere cibi al pasto (colazione, pranzo, cena)
     fun addFoodToMeal(food: Food, meal: String) {
         _userProfile.value = when (meal) {
             "breakfast" -> _userProfile.value.copy(breakfast = _userProfile.value.breakfast + food)
@@ -33,8 +34,9 @@ class UserProfileRepository {
         }
     }
 
+    //Metodo per aggiungere una ricetta al pasto (colazione, pranzo, cena)
     fun addMealToMealTime(meal: Meal, mealTime: String) {
-        // Convert Meal to Food
+        // Converitamo la ricetta in un cibo per utilizzare il metodo precedente
         val food = Food(
             id = meal.id,
             name = meal.name,
@@ -47,9 +49,7 @@ class UserProfileRepository {
         addFoodToMeal(food, mealTime)
     }
 
-    /**
-     * Rimuove SOLO la prima occorrenza di food dal pasto selezionato (in base all'id e NON solo al nome).
-     */
+    //Metodo per rimuovere un cibo dalla lista di un pastop
     fun removeFoodFromMeal(mealName: String, food: Food) {
         _userProfile.value = when (mealName) {
             "Colazione", "breakfast" -> _userProfile.value.copy(
@@ -65,9 +65,7 @@ class UserProfileRepository {
         }
     }
 
-    /**
-     * Estensione per rimuovere la PRIMA occorrenza di un Food da una lista, confrontando l'id.
-     */
+    //Metodo che permette di eliminare la prima occorrenza del cibo in base all'id
     private fun List<Food>.removeFirstOccurrence(food: Food): List<Food> {
         val idx = indexOfFirst { it.id == food.id }
         return if (idx == -1) this else toMutableList().apply { removeAt(idx) }

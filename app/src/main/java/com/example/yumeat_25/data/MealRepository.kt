@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class MealRepository {
+    //Inizializzazione di ricette di default
     private val initialMeals = listOf(
         Meal(
             id = "1",
@@ -79,16 +80,4 @@ class MealRepository {
 
     private val _meals = MutableStateFlow<List<Meal>>(initialMeals)
     val meals: StateFlow<List<Meal>> = _meals.asStateFlow()
-
-    fun addMeal(meal: Meal) {
-        _meals.value = _meals.value + meal
-    }
-
-    fun getMealsByType(type: FoodType): List<Meal> {
-        return _meals.value.filter { it.type == type }
-    }
-
-    fun getMealByName(mealName: String): Meal? {
-        return _meals.value.find { it.name == mealName }
-    }
 }

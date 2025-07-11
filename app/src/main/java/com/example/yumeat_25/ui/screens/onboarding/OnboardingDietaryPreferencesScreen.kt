@@ -23,7 +23,7 @@ fun OnboardingDietaryPreferencesScreen(
     onBack: () -> Unit
 ) {
     // Alimentazione
-    var alimentation by remember { mutableStateOf<String?>(null) } // <-- Not selected initially
+    var alimentation by remember { mutableStateOf<String?>(null) }
     val alimentationOptions = listOf("Onnivora", "Vegetariana", "Vegana")
 
     // Alimenti da evitare
@@ -39,7 +39,6 @@ fun OnboardingDietaryPreferencesScreen(
             .fillMaxSize()
             .padding(24.dp)
     ) {
-        // Header row with back
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -51,7 +50,7 @@ fun OnboardingDietaryPreferencesScreen(
             }
         }
 
-        // Progress bar at top
+        // Progress bar
         LinearProgressIndicator(
             progress = 0.66f,
             color = Color(0xFF1F5F5B),
@@ -60,7 +59,6 @@ fun OnboardingDietaryPreferencesScreen(
                 .padding(top = 24.dp, bottom = 32.dp)
         )
 
-        // Title
         Text(
             text = "Personalizza la tua\nesperienza alimentare!",
             fontSize = 22.sp,
@@ -71,7 +69,6 @@ fun OnboardingDietaryPreferencesScreen(
             lineHeight = 28.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
-        // Subtitle
         Text(
             text = "Attiva solo ciò che ti fa sentire a tuo agio.\nPuoi cambiare tutto in qualsiasi momento.",
             fontSize = 15.sp,
@@ -82,7 +79,7 @@ fun OnboardingDietaryPreferencesScreen(
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
 
-        // Tipo di alimentazione -- CARD with elevation
+        // Tipo di alimentazione
         Card(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -136,7 +133,7 @@ fun OnboardingDietaryPreferencesScreen(
 
         Spacer(modifier = Modifier.height(22.dp))
 
-        // Alimenti da evitare -- CARD with elevation
+        // Alimenti da evitare
         Card(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -189,7 +186,6 @@ fun OnboardingDietaryPreferencesScreen(
                             vegan = alimentation == "Vegana",
                             glutenFree = avoidGlutine,
                             dairyFree = avoidLatticini,
-                            allergies = listOf(),
                             avoidRedMeat = avoidCarneRossa,
                             avoidSugar = avoidZucchero
                         )

@@ -45,7 +45,7 @@ fun GoalsScreen(
     var selectedGoal by remember { mutableStateOf<String?>(goals.primaryGoal.takeIf { it in goalOptions }) }
     var safeMode by remember { mutableStateOf(goals.safeMode) }
 
-    // Sync with repository when not editing
+    // Sincronizzazione con la repository quando non stiamo editando
     LaunchedEffect(userProfile, editMode) {
         if (!editMode) {
             selectedGoal = userProfile.goals.primaryGoal.takeIf { it in goalOptions }
@@ -76,7 +76,7 @@ fun GoalsScreen(
                         Snackbar(
                             snackbarData = data,
                             containerColor = Color(0xFF295B4F),
-                            contentColor = Color.White // Optional: black text for contrast
+                            contentColor = Color.White
                         )
                     }
                 )
@@ -89,7 +89,6 @@ fun GoalsScreen(
                 .padding(paddingValues)
                 .padding(24.dp)
         ) {
-            // Title
             Text(
                 text = "Qual è il tuo obiettivo?",
                 fontSize = 22.sp,
@@ -99,7 +98,6 @@ fun GoalsScreen(
                 lineHeight = 28.sp,
                 textAlign = TextAlign.Center
             )
-            // Subtitle
             Text(
                 text = "Scegli un obiettivo che vuoi raggiungere",
                 fontSize = 15.sp,
@@ -109,8 +107,6 @@ fun GoalsScreen(
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
-
-            // Options in a rounded grey wrapper -- now as Card with elevation
             Card(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -156,7 +152,50 @@ fun GoalsScreen(
                     }
                 }
             }
+
             Spacer(modifier = Modifier.height(24.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = safeMode,
+                            onCheckedChange = { if (editMode) safeMode = it },
+                            enabled = editMode,
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = Color(0xFF1F5F5B),
+                                uncheckedColor = Color(0xFFB0B0B0),
+                                disabledCheckedColor = if (editMode) Color(0xFF1F5F5B) else Color.Gray,
+                                disabledUncheckedColor = if (editMode) Color(0xFFB0B0B0) else Color.LightGray,
+                                checkmarkColor = Color.White
+                            )
+                        )
+                        Text(
+                            text = "Attiva modalità Safe",
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+
+                    Text(
+                        text = "Nasconde numeri e contenuti potenzialmente triggeranti",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 40.dp, top = 4.dp)
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -176,7 +215,7 @@ fun GoalsScreen(
                     }
                     editMode = !editMode
                 },
-                enabled = editMode || isButtonEnabled, // Always enabled in view mode, only check for null in edit mode
+                enabled = editMode || isButtonEnabled,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF1F5F5B),
                     contentColor = Color.White

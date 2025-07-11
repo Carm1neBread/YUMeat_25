@@ -31,12 +31,11 @@ fun HelpScreen(
             .padding(horizontal = 22.dp)
     ) {
         Spacer(modifier = Modifier.height(60.dp))
-        // Row for back arrow and centered title at the same height
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(IntrinsicSize.Min) // Ensures proper centering even with large font
+                .height(IntrinsicSize.Min)
         ) {
             IconButton(
                 onClick = { navController.popBackStack() },
@@ -58,7 +57,6 @@ fun HelpScreen(
                     .align(Alignment.CenterVertically)
             )
             Spacer(modifier = Modifier.weight(1f))
-            // Invisible placeholder for symmetry (same size as IconButton)
             Box(modifier = Modifier.size(48.dp))
         }
         Spacer(modifier = Modifier.height(6.dp))

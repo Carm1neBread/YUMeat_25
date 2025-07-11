@@ -3,7 +3,6 @@ package com.example.yumeat_25.data
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlin.random.Random
 
 class FoodRepository {
     private val _foods = MutableStateFlow(getFakeFoods())
@@ -16,7 +15,7 @@ class FoodRepository {
     }
 
     private fun getFakeFoods(): List<Food> {
-        // category is now FoodType, and adds calories, carbs, protein, fat (random demo values)
+        //Inizializzaizone di cibi di default
         return listOf(
             Food("1", "Mela", FoodType.VEGAN, 52, 14, 0, 0),
             Food("2", "Banana", FoodType.VEGAN, 89, 23, 1, 0),

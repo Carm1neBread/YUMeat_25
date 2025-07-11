@@ -36,7 +36,6 @@ fun OnboardingPersonalDataScreen(
             .fillMaxSize()
             .padding(24.dp)
     ) {
-        // Header
         Row(
             modifier = Modifier.fillMaxWidth().padding(top=16.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -65,7 +64,6 @@ fun OnboardingPersonalDataScreen(
             lineHeight = 28.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
-        // Subtitle
         Text(
             text = "Raccontaci qualcosa di te!",
             fontSize = 15.sp,
@@ -76,7 +74,6 @@ fun OnboardingPersonalDataScreen(
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
 
-        // Form
         GrayRoundedTextField(
             value = name,
             onValueChange = { name = it },

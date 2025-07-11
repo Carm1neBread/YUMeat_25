@@ -14,11 +14,11 @@ data class PersonalData(
 
 @Immutable
 data class DietaryPreferences(
+    //Non inseriamo l'attributo di onnivoro, se vegetarian e vegan sono a false l'utente viene considerato automaticamente onnivoro
     val vegetarian: Boolean = false,
     val vegan: Boolean = false,
     val glutenFree: Boolean = false,
     val dairyFree: Boolean = false,
-    val allergies: List<String> = emptyList(),
     val avoidRedMeat: Boolean = false,
     val avoidSugar: Boolean = false
 )
@@ -26,7 +26,6 @@ data class DietaryPreferences(
 @Immutable
 data class UserGoals(
     val primaryGoal: String = "",
-    val secondaryGoals: List<String> = emptyList(),
     val safeMode: Boolean = false
 )
 
@@ -100,13 +99,6 @@ data class UserProfile(
     val lunch: List<Food> = emptyList(),
     val dinner: List<Food> = emptyList()
 ) {
-    fun getCompletionStatus(): Map<String, Boolean> {
-        return mapOf(
-            "personal_data" to personalData.name.isNotEmpty(),
-            "dietary_preferences" to true, // Always considered complete
-            "goals" to goals.primaryGoal.isNotEmpty()
-        )
-    }
 
     fun getCurrentCalories(): Int =
         breakfast.sumOf { it.calories } + lunch.sumOf { it.calories } + dinner.sumOf { it.calories }

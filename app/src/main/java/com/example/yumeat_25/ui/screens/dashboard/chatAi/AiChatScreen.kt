@@ -114,7 +114,7 @@ fun AIChatScreen(
                     }
                 }
 
-                // Scroll to bottom when new message is added
+                // Scorre giù ad un nuovo messagio
                 LaunchedEffect(messages.size) {
                     if (messages.isNotEmpty()) {
                         listState.animateScrollToItem(messages.size - 1)
@@ -172,7 +172,7 @@ fun AIChatScreen(
                 }
             }
 
-            // Overlay loading indicator for long operations
+            //Caricamento
             AnimatedVisibility(
                 visible = isLoading,
                 enter = fadeIn(),
