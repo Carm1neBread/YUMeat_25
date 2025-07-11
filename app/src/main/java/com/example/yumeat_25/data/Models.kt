@@ -1,6 +1,8 @@
 package com.example.yumeat_25.data
 
 import androidx.compose.runtime.Immutable
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Immutable
 data class PersonalData(
@@ -60,6 +62,29 @@ data class Meal(
     val ingredientRows: List<List<String>>? = null,
     val notes: String = ""
 )
+
+@Immutable
+data class DiaryEntry(
+    val id: String = System.currentTimeMillis().toString(),
+    val date: LocalDate = LocalDate.now(),
+    val emoji: MoodEmoji = MoodEmoji.NEUTRAL,
+    val content: String = "",
+    val timestamp: Long = System.currentTimeMillis()
+) {
+    // Formatta la data come "GG Mese YYYY" (es. "10 Luglio 2025")
+    fun getFormattedDate(): String {
+        val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+        return date.format(formatter)
+    }
+}
+
+enum class MoodEmoji(val unicode: String, val description: String) {
+    VERY_HAPPY("\uD83D\uDE00", "Molto felice"),
+    HAPPY("\uD83D\uDE42", "Felice"),
+    NEUTRAL("\uD83D\uDE10", "Neutrale"),
+    SAD("\uD83D\uDE41", "Triste")
+}
+
 
 @Immutable
 data class UserProfile(

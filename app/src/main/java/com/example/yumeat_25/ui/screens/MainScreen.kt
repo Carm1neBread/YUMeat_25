@@ -58,6 +58,7 @@ fun MainScreen(
                         "Aiuto" -> navController.navigate("help")
                         "Challenge" -> navController.navigate("challenge")
                         "Impostazioni" -> navController.navigate("settings")
+                        "Diario" -> navController.navigate("wellness_diary")
                     }
                     scope.launch { drawerState.close() }
                 },
