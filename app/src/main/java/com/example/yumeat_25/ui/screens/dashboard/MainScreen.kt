@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.yumeat_25.data.*
+import com.example.yumeat_25.ui.screens.dashboard.addMeal.AddMealMethodDialog
 import com.example.yumeat_25.ui.screens.dashboard.mainScreenUtils.DrawerMenuContent
 import com.example.yumeat_25.ui.screens.dashboard.mainScreenUtils.SemiCircularProgressBar
 import kotlinx.coroutines.launch
@@ -42,6 +43,9 @@ fun MainScreen(
     val scope = rememberCoroutineScope()
     var drawerOpenCount by remember { mutableStateOf(0) }
     var isSafeMode by rememberSaveable { mutableStateOf(initialSafeMode) }
+
+    // Stato per la modale di selezione del metodo di aggiunta
+    var showAddMethodDialog by remember { mutableStateOf(false) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -99,7 +103,7 @@ fun MainScreen(
                     .fillMaxSize()
                     .padding(horizontal = 0.dp)
             ) {
-                Spacer(Modifier.height(60.dp))
+                Spacer(Modifier.height(50.dp))
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -164,8 +168,9 @@ fun MainScreen(
                 Spacer(Modifier.weight(1f))
             }
 
+            // Floating Action Button modificato per mostrare la dialog
             FloatingActionButton(
-                onClick = { navController.navigate("add_meal?safeMode=$isSafeMode") },
+                onClick = { showAddMethodDialog = true },
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .padding(start = 20.dp, bottom = 50.dp),
@@ -185,6 +190,22 @@ fun MainScreen(
                     painter = painterResource(id = R.drawable.ai),
                     contentDescription = "AI Chat",
                     modifier = Modifier.size(30.dp)
+                )
+            }
+
+            // Dialog per scegliere il metodo di aggiunta
+            if (showAddMethodDialog) {
+                AddMealMethodDialog(
+                    onDismiss = { showAddMethodDialog = false },
+                    onManualAddClick = {
+                        navController.navigate("add_meal?safeMode=$isSafeMode")
+                    },
+                    onGalleryClick = {
+                        navController.navigate("photo_food_detail?source=gallery&safeMode=$isSafeMode")
+                    },
+                    onCameraClick = {
+                        navController.navigate("photo_food_detail?source=camera&safeMode=$isSafeMode")
+                    }
                 )
             }
         }
