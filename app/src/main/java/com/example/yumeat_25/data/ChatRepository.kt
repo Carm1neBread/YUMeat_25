@@ -12,7 +12,7 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.net.UnknownHostException
 
-class ChatRepository {
+class ChatRepository(private val userProfile: UserProfile) {
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages.asStateFlow()
 
@@ -26,70 +26,90 @@ class ChatRepository {
     private val gson = Gson()
 
     init {
-        conversationHistory.add(ApiChatMessage(
+        conversationHistory.add(generateSystemMessage(userProfile))
+    }
+
+    private fun generateSystemMessage(user: UserProfile): ApiChatMessage {
+        val calorieInfo = """
+            L'utente ha consumato finora ${user.getCurrentCalories()} kcal.
+            Carboidrati: ${user.getCurrentCarbs()}g, Proteine: ${user.getCurrentProtein()}g, Grassi: ${user.getCurrentFat()}g.
+            Obiettivo: ${user.caloriesGoal} kcal/giorno.
+        """.trimIndent()
+
+        val preferences = buildList {
+            if (user.dietaryPreferences.vegetarian) add("vegetariano")
+            if (user.dietaryPreferences.vegan) add("vegano")
+            if (user.dietaryPreferences.glutenFree) add("senza glutine")
+            if (user.dietaryPreferences.dairyFree) add("senza latticini")
+            if (user.dietaryPreferences.avoidRedMeat) add("evita carne rossa")
+            if (user.dietaryPreferences.avoidSugar) add("evita zuccheri")
+        }.joinToString(", ")
+
+        val goals = buildString {
+            append("Obiettivo principale: ${user.goals.primaryGoal}.")
+            if (user.goals.secondaryGoals.isNotEmpty()) {
+                append(" Secondari: ${user.goals.secondaryGoals.joinToString(", ")}.")
+            }
+            if (user.goals.safeMode) append(" L'utente ha attivato la modalità Safe.")
+        }
+
+        return ApiChatMessage(
             role = "system",
-            content = "Sei un assistente nutrizionale esperto che aiuta gli utenti a fare scelte alimentari sane. " +
-                    "Fornisci consigli equilibrati e supportivi, evitando approcci restrittivi. " +
-                    "Concentrati sul promuovere un rapporto sano con il cibo e il benessere generale."
-        ))
+            content = """
+                Sei un assistente nutrizionale empatico. 
+                Aiuta l’utente con consigli utili e rispettosi del suo stile alimentare.
+                
+                Dati utente:
+                Nome: ${user.personalData.name}
+                Età: ${user.personalData.age}, Altezza: ${user.personalData.height} cm, Peso: ${user.personalData.weight} kg.
+                Preferenze: $preferences.
+                $goals
+                
+                Stato nutrizionale:
+                $calorieInfo
+                
+                Rispondi sempre con empatia, senza usare toni giudicanti o promuovere comportamenti restrittivi.
+            """.trimIndent()
+        )
     }
 
     suspend fun sendMessage(content: String): Result<Unit> {
-        return try {
+        try {
             _isLoading.value = true
             _error.value = null
 
-            // Add user message to UI and history
             _messages.value = _messages.value + Message(content, true)
             conversationHistory.add(ApiChatMessage("user", content))
 
-            val request = ChatCompletionRequest(messages = conversationHistory)
-
-            try {
-                val response = OpenAIClient.service.createChatCompletion(request)
-                val aiMessage = response.choices.firstOrNull()?.message
-                if (aiMessage != null) {
-                    conversationHistory.add(aiMessage)
-                    _messages.value = _messages.value + Message(aiMessage.content, false)
-                    Result.success(Unit)
-                } else {
-                    throw IOException("Nessuna risposta dall'AI")
-                }
-            } catch (e: HttpException) {
-                val errorBody = e.response()?.errorBody()?.string()
-                val error = try {
-                    gson.fromJson(errorBody, OpenAIError::class.java)
-                } catch (e: Exception) {
-                    null
-                }
-
-                val errorMessage = when {
-                    error?.error?.type == "insufficient_quota" ->
-                        "Il servizio è momentaneamente non disponibile. Per favore riprova tra qualche minuto."
-                    e.code() == 429 ->
-                        "Troppe richieste. Per favore attendi qualche minuto prima di riprovare."
-                    e.code() == 401 ->
-                        "Errore di autenticazione. Per favore contatta il supporto."
-                    e.code() == 403 ->
-                        "Accesso non autorizzato. Per favore contatta il supporto."
-                    else ->
-                        "Si è verificato un errore di comunicazione. Per favore riprova."
-                }
-
-                _messages.value = _messages.value + Message(errorMessage, false)
-                _error.value = errorMessage
-                Result.failure(IOException(errorMessage))
-            } catch (e: UnknownHostException) {
-                val errorMessage = "Controlla la tua connessione internet e riprova."
-                _messages.value = _messages.value + Message(errorMessage, false)
-                _error.value = errorMessage
-                Result.failure(e)
+            val response = OpenAIClient.service.createChatCompletion(
+                ChatCompletionRequest(messages = conversationHistory)
+            )
+            val aiMessage = response.choices.firstOrNull()?.message
+            if (aiMessage != null) {
+                conversationHistory.add(aiMessage)
+                _messages.value = _messages.value + Message(aiMessage.content, false)
+                return Result.success(Unit)
+            } else {
+                throw IOException("Nessuna risposta ricevuta dall'assistente.")
             }
         } catch (e: Exception) {
-            val errorMessage = "Si è verificato un errore imprevisto. Per favore riprova."
-            _messages.value = _messages.value + Message(errorMessage, false)
+            val errorMessage = when (e) {
+                is HttpException -> {
+                    val errorBody = e.response()?.errorBody()?.string()
+                    val error = gson.fromJson(errorBody, OpenAIError::class.java)
+                    when (e.code()) {
+                        429 -> "Troppe richieste. Attendi un momento."
+                        401 -> "Autenticazione fallita."
+                        403 -> "Accesso non autorizzato."
+                        else -> error?.error?.message ?: "Errore HTTP generico."
+                    }
+                }
+                is UnknownHostException -> "Connessione internet assente."
+                else -> "Errore imprevisto: ${e.localizedMessage}"
+            }
             _error.value = errorMessage
-            Result.failure(e)
+            _messages.value = _messages.value + Message(errorMessage, false)
+            return Result.failure(e)
         } finally {
             _isLoading.value = false
         }
@@ -99,11 +119,6 @@ class ChatRepository {
         _messages.value = emptyList()
         _error.value = null
         conversationHistory.clear()
-        conversationHistory.add(ApiChatMessage(
-            role = "system",
-            content = "Sei un assistente nutrizionale esperto che aiuta gli utenti a fare scelte alimentari sane. " +
-                    "Fornisci consigli equilibrati e supportivi, evitando approcci restrittivi. " +
-                    "Concentrati sul promuovere un rapporto sano con il cibo e il benessere generale."
-        ))
+        conversationHistory.add(generateSystemMessage(userProfile))
     }
 }

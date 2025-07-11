@@ -16,9 +16,11 @@ fun YUMeatNavigation(
     navController: NavHostController = rememberNavController()
 ) {
     val userProfileRepository = remember { UserProfileRepository() }
+    val userProfile by userProfileRepository.userProfile.collectAsState()
     val mealRepository = remember { MealRepository() }
     val foodRepository = remember { FoodRepository() }
-    val userProfile by userProfileRepository.userProfile.collectAsState()
+    val chatRepository = remember(userProfile) { ChatRepository(userProfile) }
+    val diaryRepository = remember { DiaryRepository() }  // Aggiungiamo il repository del diario
 
     var selectedMealName by remember { mutableStateOf<String?>(null) }
 
@@ -159,7 +161,16 @@ fun YUMeatNavigation(
         }
 
         composable("wellness_diary") {
-            WellnessDiaryScreen(onBack = { navController.popBackStack() })
+            WellnessDiaryScreen(
+                navController = navController,
+                diaryRepository = diaryRepository
+            )
+        }
+        composable("diary_history") {
+            DiaryHistoryScreen(
+                onBack = { navController.popBackStack() },
+                diaryRepository = diaryRepository
+            )
         }
 
         // Ricette - SafeMode aware
@@ -250,7 +261,7 @@ fun YUMeatNavigation(
         composable("ai_chat") {
             AIChatScreen(
                 navController = navController,
-                chatRepository = remember { ChatRepository() }
+                chatRepository = chatRepository
             )
         }
     }
