@@ -1,4 +1,4 @@
-package com.example.yumeat_25.ui.screens
+package com.example.yumeat_25.ui.screens.dashboard
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.yumeat_25.data.*
-import com.example.yumeat_25.ui.screens.MainScreen.DrawerMenuContent
-import com.example.yumeat_25.ui.screens.MainScreen.SemiCircularProgressBar
+import com.example.yumeat_25.ui.screens.dashboard.mainScreenUtils.DrawerMenuContent
+import com.example.yumeat_25.ui.screens.dashboard.mainScreenUtils.SemiCircularProgressBar
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.TextStyle

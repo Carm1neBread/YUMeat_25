@@ -1,4 +1,4 @@
-package com.example.yumeat_25.ui.screens
+package com.example.yumeat_25.ui.screens.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

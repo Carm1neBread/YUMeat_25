@@ -1,4 +1,4 @@
-package com.example.yumeat_25.ui.screens
+package com.example.yumeat_25.ui.screens.support.diary
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

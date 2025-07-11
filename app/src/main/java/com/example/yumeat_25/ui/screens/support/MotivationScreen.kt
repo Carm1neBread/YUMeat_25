@@ -1,4 +1,4 @@
-package com.example.yumeat_25.ui.screens
+package com.example.yumeat_25.ui.screens.support
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween

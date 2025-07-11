@@ -1,4 +1,4 @@
-package com.example.yumeat_25.ui.screens
+package com.example.yumeat_25.ui.screens.dashboard
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +19,7 @@ import com.example.yumeat_25.data.UserProfileRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MealDetailsSafeMode(
+fun MealDetailsScreen(
     navController: NavController,
     userProfileRepository: UserProfileRepository
 ) {
@@ -29,6 +29,7 @@ fun MealDetailsSafeMode(
         "Pranzo" to userProfile.lunch,
         "Cena" to userProfile.dinner
     )
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -78,6 +79,17 @@ fun MealDetailsSafeMode(
                                 Text(food.name, fontWeight = FontWeight.Medium)
                                 Text(
                                     food.type.displayName,
+                                    fontSize = 12.sp,
+                                    color = Color.Gray
+                                )
+                            }
+                            Column(
+                                horizontalAlignment = Alignment.End,
+                                modifier = Modifier.padding(end = 8.dp)
+                            ) {
+                                Text("${food.calories} kcal", fontWeight = FontWeight.SemiBold)
+                                Text(
+                                    "C:${food.carbs}g P:${food.protein}g F:${food.fat}g",
                                     fontSize = 12.sp,
                                     color = Color.Gray
                                 )
