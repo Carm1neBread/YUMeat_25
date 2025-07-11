@@ -1,17 +1,16 @@
-package com.example.yumeat_25.ui.screens.dashboard.addMeal
+package com.example.yumeat_25.ui.screens.dashboard.addMeal.addManual
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,7 +18,7 @@ import com.example.yumeat_25.data.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddMealScreen(
+fun AddMealSafeMode(
     userProfileRepository: UserProfileRepository,
     foodRepository: FoodRepository,
     onBack: () -> Unit,
@@ -27,7 +26,6 @@ fun AddMealScreen(
 ) {
     var selectedMealTime by remember { mutableStateOf("breakfast") }
     var searchQuery by remember { mutableStateOf("") }
-    var showAddFoodDialog by remember { mutableStateOf<Food?>(null) }
 
     val foods by foodRepository.foods.collectAsState()
 
@@ -38,7 +36,7 @@ fun AddMealScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Aggiungi alimento") },
+                title = { Text("Aggiungi alimento (Safe Mode)") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Indietro")
@@ -55,7 +53,7 @@ fun AddMealScreen(
         ) {
             // Selezione pasto: colazione, pranzo, cena
             Text(
-                text = "A quale pasto vuoi aggiungere? (valori per 100g)",
+                text = "A quale pasto vuoi aggiungere?",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -91,41 +89,26 @@ fun AddMealScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(filteredFoods) { food ->
-                    FoodItem(
+                    FoodItemSafeMode(
                         food = food,
                         onQuickAdd = {
                             userProfileRepository.addFoodToMeal(food, selectedMealTime)
                             onMealAdded()
                         },
-                        onDetailAdd = { showAddFoodDialog = food },
                         canQuickAdd = selectedMealTime.isNotBlank()
                     )
                 }
             }
         }
     }
-
-    // Dialog per aggiunta dettagliata
-    if (showAddFoodDialog != null) {
-        AddFoodDetailDialog(
-            defaultFood = showAddFoodDialog!!,
-            onDismiss = { showAddFoodDialog = null },
-            onConfirm = { food ->
-                userProfileRepository.addFoodToMeal(food, selectedMealTime)
-                onMealAdded()
-            }
-        )
-    }
 }
 
 @Composable
-fun FoodItem(
+fun FoodItemSafeMode(
     food: Food,
     onQuickAdd: () -> Unit,
-    onDetailAdd: () -> Unit,
     canQuickAdd: Boolean
 ) {
-    val customColor = Color(0xFF1F5F5B)
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -141,14 +124,10 @@ fun FoodItem(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
                 )
+                // In safe mode NON mostro info nutrizionali ma solo la categoria (vegano, vegetariano, ecc...)
                 Text(
                     text = food.type.displayName,
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "${food.calories} kcal • C: ${food.carbs}g P: ${food.protein}g F: ${food.fat}g",
-                    fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -161,18 +140,9 @@ fun FoodItem(
                     Icon(
                         Icons.Default.Add,
                         contentDescription = "Aggiungi rapidamente",
-                        tint = Color(0xFF0694F4)
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
-            }
-
-            TextButton(
-                onClick = onDetailAdd,
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = customColor
-                )
-            ) {
-                Text("Dettagli")
             }
         }
     }

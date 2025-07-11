@@ -8,8 +8,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.yumeat_25.data.*
-import com.example.yumeat_25.ui.screens.dashboard.addMeal.AddMealSafeMode
-import com.example.yumeat_25.ui.screens.dashboard.addMeal.AddMealScreen
+import com.example.yumeat_25.ui.screens.dashboard.addMeal.addManual.AddMealSafeMode
+import com.example.yumeat_25.ui.screens.dashboard.addMeal.addManual.AddMealScreen
+import com.example.yumeat_25.ui.screens.dashboard.addMeal.PhotoFoodDetailScreen
 import com.example.yumeat_25.ui.screens.challenge.ChallengeScreen
 import com.example.yumeat_25.ui.screens.dashboard.chatAi.AIChatScreen
 import com.example.yumeat_25.ui.screens.dashboard.MainScreen
@@ -155,6 +156,30 @@ fun YUMeatNavigation(
                     onMealAdded = { navController.popBackStack() }
                 )
             }
+        }
+
+        // NUOVA ROTTA: Schermata di dettaglio cibo fotografato
+        composable(
+            route = "photo_food_detail?source={source}&safeMode={safeMode}",
+            arguments = listOf(
+                navArgument("source") {
+                    type = NavType.StringType
+                    defaultValue = "camera"
+                },
+                navArgument("safeMode") {
+                    type = NavType.StringType
+                    defaultValue = "false"
+                }
+            )
+        ) { backStackEntry ->
+            val source = backStackEntry.arguments?.getString("source") ?: "camera"
+            val safeMode = backStackEntry.arguments?.getString("safeMode") == "true"
+            PhotoFoodDetailScreen(
+                navController = navController,
+                userProfileRepository = userProfileRepository,
+                isSafeMode = safeMode,
+                photoSource = source
+            )
         }
 
         composable("profile") {
