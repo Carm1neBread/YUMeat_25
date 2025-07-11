@@ -1,4 +1,4 @@
-package com.example.yumeat_25.ui.screens.MainScreen
+package com.example.yumeat_25.ui.screens.dashboard.mainScreenUtils
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box

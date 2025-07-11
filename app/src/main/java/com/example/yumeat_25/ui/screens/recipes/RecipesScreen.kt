@@ -1,4 +1,4 @@
-package com.example.yumeat_25.ui.screens
+package com.example.yumeat_25.ui.screens.recipes
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn

@@ -1,4 +1,4 @@
-package com.example.yumeat_25.ui.screens
+package com.example.yumeat_25.ui.screens.dashboard.addMeal
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -53,7 +53,7 @@ fun AddMealSafeMode(
         ) {
             // Selezione pasto: colazione, pranzo, cena
             Text(
-                text = "A quale pasto vuoi aggiungere? *",
+                text = "A quale pasto vuoi aggiungere?",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)

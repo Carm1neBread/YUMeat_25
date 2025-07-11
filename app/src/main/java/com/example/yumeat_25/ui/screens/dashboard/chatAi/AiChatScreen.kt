@@ -1,4 +1,4 @@
-package com.example.yumeat_25.ui.screens
+package com.example.yumeat_25.ui.screens.dashboard.chatAi
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn

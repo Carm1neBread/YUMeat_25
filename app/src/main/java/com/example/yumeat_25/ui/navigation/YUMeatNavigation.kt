@@ -8,8 +8,24 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.yumeat_25.data.*
-import com.example.yumeat_25.ui.screens.*
+import com.example.yumeat_25.ui.screens.dashboard.addMeal.AddMealSafeMode
+import com.example.yumeat_25.ui.screens.dashboard.addMeal.AddMealScreen
+import com.example.yumeat_25.ui.screens.challenge.ChallengeScreen
+import com.example.yumeat_25.ui.screens.dashboard.chatAi.AIChatScreen
+import com.example.yumeat_25.ui.screens.dashboard.MainScreen
+import com.example.yumeat_25.ui.screens.dashboard.MealDetailsSafeMode
+import com.example.yumeat_25.ui.screens.dashboard.MealDetailsScreen
 import com.example.yumeat_25.ui.screens.onboarding.*
+import com.example.yumeat_25.ui.screens.profile.DietaryPreferencesScreen
+import com.example.yumeat_25.ui.screens.profile.GoalsScreen
+import com.example.yumeat_25.ui.screens.profile.PersonalDataScreen
+import com.example.yumeat_25.ui.screens.recipes.RecipeDetailScreen
+import com.example.yumeat_25.ui.screens.recipes.RecipesScreen
+import com.example.yumeat_25.ui.screens.settings.SettingsScreen
+import com.example.yumeat_25.ui.screens.support.HelpScreen
+import com.example.yumeat_25.ui.screens.support.MotivationScreen
+import com.example.yumeat_25.ui.screens.support.diary.DiaryHistoryScreen
+import com.example.yumeat_25.ui.screens.support.diary.WellnessDiaryScreen
 
 @Composable
 fun YUMeatNavigation(
