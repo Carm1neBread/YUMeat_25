@@ -89,14 +89,19 @@ fun AddMealSafeMode(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(filteredFoods) { food ->
-                    FoodItemSafeMode(
-                        food = food,
-                        onQuickAdd = {
-                            userProfileRepository.addFoodToMeal(food, selectedMealTime)
-                            onMealAdded()
-                        },
-                        canQuickAdd = selectedMealTime.isNotBlank()
-                    )
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Added elevation
+                    ) {
+                        FoodItemSafeMode(
+                            food = food,
+                            onQuickAdd = {
+                                userProfileRepository.addFoodToMeal(food, selectedMealTime)
+                                onMealAdded()
+                            },
+                            canQuickAdd = selectedMealTime.isNotBlank()
+                        )
+                    }
                 }
             }
         }
@@ -109,40 +114,36 @@ fun FoodItemSafeMode(
     onQuickAdd: () -> Unit,
     canQuickAdd: Boolean
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = food.name,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                // In safe mode NON mostro info nutrizionali ma solo la categoria (vegano, vegetariano, ecc...)
-                Text(
-                    text = food.type.displayName,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = food.name,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+            // In safe mode NON mostro info nutrizionali ma solo la categoria (vegano, vegetariano, ecc...)
+            Text(
+                text = food.type.displayName,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
 
-            if (canQuickAdd) {
-                IconButton(
-                    onClick = onQuickAdd,
-                    modifier = Modifier.padding(end = 8.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = "Aggiungi rapidamente",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
+        if (canQuickAdd) {
+            IconButton(
+                onClick = onQuickAdd,
+                modifier = Modifier.padding(end = 8.dp)
+            ) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = "Aggiungi rapidamente",
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }
