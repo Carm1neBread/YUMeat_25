@@ -34,7 +34,8 @@ fun AddMealMethodDialog(
                 .fillMaxWidth()
                 .padding(16.dp),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Added elevation
         ) {
             Column(
                 modifier = Modifier
@@ -50,36 +51,59 @@ fun AddMealMethodDialog(
                 )
 
                 // Opzione per aggiunta manuale (usando l'icona predefinita)
-                AddMethodOptionWithVector(
-                    icon = Icons.Default.Edit,
-                    title = "Aggiungere manualmente",
-                    onClick = {
-                        onDismiss()
-                        onManualAddClick()
-                    }
-                )
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Added elevation
+                ) {
+                    AddMethodOptionWithVector(
+                        icon = Icons.Default.Edit,
+                        title = "Aggiungere manualmente",
+                        onClick = {
+                            onDismiss()
+                            onManualAddClick()
+                        }
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                AddMethodOptionWithResource(
-                    iconResId = R.drawable.photo_library,
-                    title = "Aggiungere dalla libreria",
-                    onClick = {
-                        onDismiss()
-                        onGalleryClick()
-                    }
-                )
+                // Opzione per aggiunta da libreria (usando l'icona personalizzata)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Added elevation
+                ) {
+                    AddMethodOptionWithResource(
+                        iconResId = R.drawable.photo_library, // La tua icona personalizzata per la galleria
+                        title = "Aggiungere dalla libreria",
+                        onClick = {
+                            onDismiss()
+                            onGalleryClick()
+                        }
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                AddMethodOptionWithResource(
-                    iconResId = R.drawable.camera,
-                    title = "Aggiungere con foto",
-                    onClick = {
-                        onDismiss()
-                        onCameraClick()
-                    }
-                )
+                // Opzione per aggiunta da fotocamera (usando l'icona personalizzata)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Added elevation
+                ) {
+                    AddMethodOptionWithResource(
+                        iconResId = R.drawable.camera, // La tua icona personalizzata per la fotocamera
+                        title = "Aggiungere con foto",
+                        onClick = {
+                            onDismiss()
+                            onCameraClick()
+                        }
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -107,9 +131,7 @@ private fun AddMethodOptionWithVector(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
-            .background(Color(0xFFF3F3F3))
             .padding(vertical = 16.dp, horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -137,9 +159,7 @@ private fun AddMethodOptionWithResource(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
-            .background(Color(0xFFF3F3F3))
             .padding(vertical = 16.dp, horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

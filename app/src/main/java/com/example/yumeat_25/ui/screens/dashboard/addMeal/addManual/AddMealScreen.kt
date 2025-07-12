@@ -91,15 +91,20 @@ fun AddMealScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(filteredFoods) { food ->
-                    FoodItem(
-                        food = food,
-                        onQuickAdd = {
-                            userProfileRepository.addFoodToMeal(food, selectedMealTime)
-                            onMealAdded()
-                        },
-                        onDetailAdd = { showAddFoodDialog = food },
-                        canQuickAdd = selectedMealTime.isNotBlank()
-                    )
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Added elevation
+                    ) {
+                        FoodItem(
+                            food = food,
+                            onQuickAdd = {
+                                userProfileRepository.addFoodToMeal(food, selectedMealTime)
+                                onMealAdded()
+                            },
+                            onDetailAdd = { showAddFoodDialog = food },
+                            canQuickAdd = selectedMealTime.isNotBlank()
+                        )
+                    }
                 }
             }
         }
@@ -126,54 +131,50 @@ fun FoodItem(
     canQuickAdd: Boolean
 ) {
     val customColor = Color(0xFF1F5F5B)
-    Card(
-        modifier = Modifier.fillMaxWidth()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = food.name,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = food.type.displayName,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "${food.calories} kcal • C: ${food.carbs}g P: ${food.protein}g F: ${food.fat}g",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = food.name,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Text(
+                text = food.type.displayName,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = "${food.calories} kcal • C: ${food.carbs}g P: ${food.protein}g F: ${food.fat}g",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
 
-            if (canQuickAdd) {
-                IconButton(
-                    onClick = onQuickAdd,
-                    modifier = Modifier.padding(end = 8.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = "Aggiungi rapidamente",
-                        tint = Color(0xFF0694F4)
-                    )
-                }
-            }
-
-            TextButton(
-                onClick = onDetailAdd,
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = customColor
-                )
+        if (canQuickAdd) {
+            IconButton(
+                onClick = onQuickAdd,
+                modifier = Modifier.padding(end = 8.dp)
             ) {
-                Text("Dettagli")
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = "Aggiungi rapidamente",
+                    tint = Color(0xFF0694F4)
+                )
             }
+        }
+
+        TextButton(
+            onClick = onDetailAdd,
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = customColor
+            )
+        ) {
+            Text("Dettagli")
         }
     }
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -44,6 +45,15 @@ fun PhotoFoodDetailScreen(
     val fat = 15
     val imageRes = R.drawable.poke_foto // Dovrai aggiungere questa immagine
 
+    // Ingredienti fittizi per la poke bowl
+    val ingredientTitles = listOf("Base", "Proteine", "Condimenti")
+    val ingredientRows = listOf(
+        listOf("Riso", "Salmone", "Salsa di soia"),
+        listOf("Avocado", "Tonno", "Sesamo"),
+        listOf("Cetriolo", "Gamberetti", "Wasabi"),
+        listOf("Edamame", "Uova", "Zenzero")
+    )
+
     val food = Food(
         id = "photo_detected",
         name = foodName,
@@ -55,7 +65,7 @@ fun PhotoFoodDetailScreen(
     )
 
     // Safe Mode Flow State
-    var showActiveListening by remember { mutableStateOf(isSafeMode) }
+    var showActiveListening by remember { mutableStateOf(false) }
     var showFeelBadDialog by remember { mutableStateOf(false) }
     var showPauseScreen by remember { mutableStateOf(false) }
     var pauseSecondsLeft by remember { mutableStateOf(30) }
@@ -67,7 +77,7 @@ fun PhotoFoodDetailScreen(
     var showMealTimeDialog by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
-    // Timer function
+    // Timer function per la schermata di pausa
     fun startPauseTimer() {
         pauseSecondsLeft = 30
         pauseTimerRunning = true
@@ -78,13 +88,13 @@ fun PhotoFoodDetailScreen(
             }
             pauseTimerRunning = false
             showPauseScreen = false
-            if (isSafeMode && !safeModePopupCompleted) {
+            if (isSafeMode) {
                 safeModePopupCompleted = true
             }
         }
     }
 
-    // Blocca aggiunta se modalità safe è attiva
+    // Blocca aggiunta se modalità safe è attiva e modale è visualizzata
     val canAdd = !showActiveListening && !showFeelBadDialog && !showPauseScreen
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -119,67 +129,159 @@ fun PhotoFoodDetailScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Card(
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(24.dp),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(
-                            modifier = Modifier.padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            modifier = Modifier.padding(20.dp)
                         ) {
-                            Text(
-                                text = "Abbiamo rilevato:",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier.padding(bottom = 16.dp)
-                            )
+                            // Header con nome e emoji
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = foodName,
+                                    fontSize = 26.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
 
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Immagine
                             Image(
                                 painter = painterResource(id = imageRes),
                                 contentDescription = foodName,
                                 modifier = Modifier
-                                    .height(180.dp)
                                     .fillMaxWidth()
+                                    .height(200.dp)
                                     .clip(RoundedCornerShape(16.dp))
                             )
 
-                            Text(
-                                text = foodName,
-                                fontSize = 26.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(vertical = 16.dp)
-                            )
+                            Spacer(modifier = Modifier.height(20.dp))
 
-                            // Visualizzazione dei nutrienti in base alla modalità
+                            // Sezione valori nutrizionali
                             if (!isSafeMode) {
-                                NormalModeNutrients(calories, carbs, protein, fat)
+                                Text(
+                                    text = "Valori nutrizionali",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp,
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
+
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = "Calorie: $calories kcal",
+                                        fontSize = 14.sp,
+                                        color = Color(0xFF555555),
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = "Carboidrati: ${carbs}g",
+                                        fontSize = 14.sp,
+                                        color = Color(0xFF555555),
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 16.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = "Proteine: ${protein}g",
+                                        fontSize = 14.sp,
+                                        color = Color(0xFF555555),
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = "Grassi: ${fat}g",
+                                        fontSize = 14.sp,
+                                        color = Color(0xFF555555),
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             } else {
                                 SafeModeNutrients()
                             }
-                        }
-                    }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                            // Sezione ingredienti
+                            Text(
+                                text = "Ingredienti",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
 
-                    Button(
-                        onClick = {
-                            if (isSafeMode && !safeModePopupCompleted) {
-                                showActiveListening = true
-                            } else {
-                                showMealTimeDialog = true
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                ingredientTitles.forEach {
+                                    Text(
+                                        text = it,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 15.sp,
+                                        modifier = Modifier.weight(1f),
+                                        color = Color(0xFF333333),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF1F5F5B),
-                            contentColor = Color.White
-                        ),
-                        enabled = canAdd
-                    ) {
-                        Text("Aggiungi al diario", fontSize = 16.sp)
+
+                            ingredientRows.forEach { row ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    row.forEach {
+                                        Text(
+                                            text = it,
+                                            fontSize = 14.sp,
+                                            modifier = Modifier.weight(1f),
+                                            color = Color(0xFF555555),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            // Pulsante di aggiunta - logica modificata
+                            Button(
+                                onClick = {
+                                    if (isSafeMode && !safeModePopupCompleted) {
+                                        // Se in safe mode e non ancora mostrato il popup, mostra il popup
+                                        showActiveListening = true
+                                    } else {
+                                        // Altrimenti vai direttamente al dialog di selezione del pasto
+                                        showMealTimeDialog = true
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(46.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF295B4F),
+                                    contentColor = Color.White
+                                ),
+                                enabled = canAdd
+                            ) {
+                                Text("Aggiungi", fontSize = 16.sp)
+                            }
+                        }
                     }
                 }
             }
@@ -189,7 +291,6 @@ fun PhotoFoodDetailScreen(
                 ActiveListeningDialog(
                     onFeelGood = {
                         showActiveListening = false
-                        showMealTimeDialog = true
                         safeModePopupCompleted = true
                     },
                     onFeelBad = {
@@ -208,7 +309,6 @@ fun PhotoFoodDetailScreen(
                     },
                     onProceed = {
                         showFeelBadDialog = false
-                        showMealTimeDialog = true
                         safeModePopupCompleted = true
                     }
                 )
@@ -225,64 +325,6 @@ fun PhotoFoodDetailScreen(
                         }
                     }
                 )
-            }
-        }
-    }
-}
-
-@Composable
-private fun NormalModeNutrients(calories: Int, carbs: Int, protein: Int, fat: Int) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
-            .padding(16.dp)
-    ) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Calorie", fontSize = 16.sp)
-                Text("$calories kcal", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Divider(color = Color(0xFFE0E0E0))
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Carboidrati", fontSize = 16.sp)
-                Text("${carbs}g", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Divider(color = Color(0xFFE0E0E0))
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Proteine", fontSize = 16.sp)
-                Text("${protein}g", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Divider(color = Color(0xFFE0E0E0))
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Grassi", fontSize = 16.sp)
-                Text("${fat}g", fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }
@@ -319,7 +361,7 @@ fun PauseBlockScreen(
             Box(
                 modifier = Modifier
                     .size(80.dp)
-                    .background(Color.Transparent, shape = RoundedCornerShape(40.dp)),
+                    .background(Color.Transparent, shape = CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -425,6 +467,8 @@ fun AddMealToTimeDialog(
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit
 ) {
+    val customColor1 = Color(color=0xFF0694F4);
+    val customColor2 = Color.Red;
     var selectedMealTime by remember { mutableStateOf("breakfast") }
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -437,12 +481,20 @@ fun AddMealToTimeDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(selectedMealTime) }) {
+            TextButton(onClick = { onConfirm(selectedMealTime) },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = customColor1
+                )
+            ) {
                 Text("Aggiungi")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = onDismiss,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = customColor2
+                )
+            ) {
                 Text("Annulla")
             }
         }
