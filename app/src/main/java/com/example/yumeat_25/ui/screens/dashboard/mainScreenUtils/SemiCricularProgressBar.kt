@@ -12,7 +12,7 @@ import kotlin.math.*
 
 @Composable
 fun SemiCircularProgressBar(
-    progress: Float, // 0f to 1f
+    progress: Float,
     modifier: Modifier = Modifier,
     strokeWidth: Float = 16f,
     backgroundColor: Color = Color(0x11000000),
@@ -44,9 +44,11 @@ fun SemiCircularProgressBar(
                 style = Stroke(strokeWidth, cap = StrokeCap.Round)
             )
             if (drawEndDot && progress > 0f) {
-                val angleRad = Math.toRadians(180.0 + 180.0 * progress)
+                // Limita la posizione del pallino alla grandezza del semicerchio
+                val limitedProgress = progress.coerceIn(0f, 1f)
+                val angleRad = Math.toRadians(180.0 + 180.0 * limitedProgress)
                 val radius = diameter / 2
-                val dotRadius = strokeWidth / 2
+                val dotRadius = strokeWidth / 1.5f
                 val center = Offset(radius, radius)
                 val dotCenter = Offset(
                     x = center.x + radius * cos(angleRad).toFloat(),
@@ -54,7 +56,7 @@ fun SemiCircularProgressBar(
                 )
                 drawCircle(
                     color = progressColor,
-                    radius = dotRadius + 2,
+                    radius = dotRadius + 3,
                     center = dotCenter
                 )
             }

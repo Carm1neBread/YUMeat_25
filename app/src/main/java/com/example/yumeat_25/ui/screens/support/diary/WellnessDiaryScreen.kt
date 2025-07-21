@@ -194,7 +194,8 @@ fun WellnessDiaryScreen(
                 },
                 shape = RoundedCornerShape(24.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1F5F5B)
+                    containerColor = Color(0xFF1F5F5B),
+                    contentColor = Color.White
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
