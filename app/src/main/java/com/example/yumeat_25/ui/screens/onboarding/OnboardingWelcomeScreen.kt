@@ -285,10 +285,10 @@ fun OnboardingWelcomeScreen(
 private fun createDefaultProfile(userProfileRepository: UserProfileRepository) {
     // Dati personali casuali ma realistici
     val personalData = PersonalData(
-        name = "Utente",
-        age = "30",
-        height = "175",
-        weight = "70"
+        name = "Giuliana",
+        age = "55",
+        height = "165",
+        weight = "65"
     )
 
     // Preferenze alimentari di default

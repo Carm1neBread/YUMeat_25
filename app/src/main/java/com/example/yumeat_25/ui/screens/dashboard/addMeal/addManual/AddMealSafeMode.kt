@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -142,7 +143,7 @@ fun FoodItemSafeMode(
                 Icon(
                     Icons.Default.Add,
                     contentDescription = "Aggiungi rapidamente",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = Color(0xFF0694F4)
                 )
             }
         }

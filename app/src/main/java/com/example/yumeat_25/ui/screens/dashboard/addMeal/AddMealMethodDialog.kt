@@ -1,7 +1,6 @@
 package com.example.yumeat_25.ui.screens.dashboard.addMeal
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -35,7 +33,7 @@ fun AddMealMethodDialog(
                 .padding(16.dp),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Added elevation
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -57,12 +55,12 @@ fun AddMealMethodDialog(
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F3F3)),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Added elevation
                 ) {
-                    AddMethodOptionWithVector(
-                        icon = Icons.Default.Edit,
-                        title = "Aggiungere manualmente",
+                    AddMethodOptionWithResource(
+                        iconResId = R.drawable.edit,
+                        title = "Aggiungere maualmente",
                         onClick = {
                             onDismiss()
-                            onManualAddClick()
+                            onCameraClick()
                         }
                     )
                 }
@@ -77,7 +75,7 @@ fun AddMealMethodDialog(
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Added elevation
                 ) {
                     AddMethodOptionWithResource(
-                        iconResId = R.drawable.photo_library, // La tua icona personalizzata per la galleria
+                        iconResId = R.drawable.photo_library,
                         title = "Aggiungere dalla libreria",
                         onClick = {
                             onDismiss()
@@ -96,7 +94,7 @@ fun AddMealMethodDialog(
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Added elevation
                 ) {
                     AddMethodOptionWithResource(
-                        iconResId = R.drawable.camera, // La tua icona personalizzata per la fotocamera
+                        iconResId = R.drawable.camera,
                         title = "Aggiungere con foto",
                         onClick = {
                             onDismiss()
@@ -113,7 +111,7 @@ fun AddMealMethodDialog(
                 ) {
                     Text(
                         text = "Annulla",
-                        color = Color(0xFF1F5F5B),
+                        color = Color(0xFFFF0000),
                         fontWeight = FontWeight.Medium
                     )
                 }
