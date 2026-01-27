@@ -5,6 +5,12 @@ Traccia i tuoi pasti con facilità, ricevi supporto motivazionale e segui il tuo
 
 ---
 
+## Prototipo Figma 🏗️
+
+[Link al prototipo](https://www.figma.com/proto/109Qce6UNEBFjlo492B4Tl?node-id=0-1&t=L9HTr3FfzjWUNvyD-6)
+
+---
+
 ## Funzionalità principali 🛠️
 
 - **Aggiunta dei pasti**  
