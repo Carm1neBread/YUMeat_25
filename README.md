@@ -74,7 +74,3 @@ Traccia i tuoi pasti con facilità, ricevi supporto motivazionale e segui il tuo
 ## Autori
 
 - [Cataldo Carmine](https://github.com/Carm1neBread)
-- [Pellegrino Francesca](https://github.com/francescaapellegrino)
-- [Valentino Nello Antonio](https://github.com/Nellow04)
-- [Fausto Simone](https://github.com/IlCorvo12)
-- [D'Arco Francesco]()
